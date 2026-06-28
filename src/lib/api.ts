@@ -1,23 +1,32 @@
-import { ImageQueryResponse } from "./schemas";
+import { SearchResponse } from "./schemas";
 
-export async function searchSimilar(
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+
+async function postFile(
+  endpoint: string,
   file: File,
-  k: number = 5,
-): Promise<ImageQueryResponse> {
-  const url = new URL("/image-search", process.env.NEXT_PUBLIC_API_URL);
+  k: number,
+): Promise<SearchResponse> {
+  const url = new URL(endpoint, API_URL);
   url.searchParams.set("k", String(k));
 
   const formData = new FormData();
   formData.append("file", file);
 
-  const res = await fetch(url.toString(), {
-    method: "POST",
-    body: formData,
-  });
+  const res = await fetch(url.toString(), { method: "POST", body: formData });
 
   if (!res.ok) {
-    throw new Error(`Search failed: ${res.status} ${res.statusText}`);
+    const text = await res.text().catch(() => res.statusText);
+    throw new Error(`${res.status}: ${text}`);
   }
 
-  return res.json();
+  return SearchResponse.parse(await res.json());
+}
+
+export function searchByImage(file: File, k = 5) {
+  return postFile("/images/search", file, k);
+}
+
+export function searchByAudio(file: File, k = 5) {
+  return postFile("/audio/search", file, k);
 }

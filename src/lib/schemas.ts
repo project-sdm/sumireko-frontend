@@ -1,7 +1,7 @@
 import { z } from "zod";
 
-export const ImageQueryResponse = z.object({
+export const SearchResponse = z.object({
   results: z.array(z.string()),
 });
 
-export type ImageQueryResponse = z.infer<typeof ImageQueryResponse>;
+export type SearchResponse = z.infer<typeof SearchResponse>;
