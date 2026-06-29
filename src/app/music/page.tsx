@@ -29,6 +29,7 @@ export default function Music() {
   const [file, setFile] = useState<File | null>(null);
   const [fileName, setFileName] = useState<string | null>(null);
   const [k, setK] = useState(5);
+  const [kRaw, setKRaw] = useState("5");
   const [results, setResults] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -317,16 +318,27 @@ export default function Music() {
           <div className="flex items-center gap-2 rounded-lg bg-surface border border-surface-border px-3 py-2">
             <label className="text-sm text-foreground/60">Resultados</label>
             <button
-              onClick={() => setK((v) => Math.max(1, v - 1))}
+              onClick={() => { const n = Math.max(1, k - 1); setK(n); setKRaw(String(n)); }}
               className="flex h-7 w-7 items-center justify-center rounded-md bg-foreground/5 text-sm font-medium hover:bg-foreground/10 transition-colors"
             >
               −
             </button>
-            <span className="w-6 text-center text-sm font-medium tabular-nums">
-              {k}
-            </span>
+            <input
+              type="number"
+              min={1}
+              max={40}
+              value={kRaw}
+              onChange={(e) => setKRaw(e.target.value)}
+              onBlur={() => {
+                const v = parseInt(kRaw, 10);
+                const clamped = isNaN(v) ? k : Math.min(40, Math.max(1, v));
+                setK(clamped);
+                setKRaw(String(clamped));
+              }}
+              className="w-10 text-center text-sm font-medium tabular-nums bg-transparent outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+            />
             <button
-              onClick={() => setK((v) => Math.min(20, v + 1))}
+              onClick={() => { const n = Math.min(40, k + 1); setK(n); setKRaw(String(n)); }}
               className="flex h-7 w-7 items-center justify-center rounded-md bg-foreground/5 text-sm font-medium hover:bg-foreground/10 transition-colors"
             >
               +
@@ -335,7 +347,7 @@ export default function Music() {
           <button
             onClick={handleSearch}
             disabled={loading}
-            className="rounded-lg bg-accent px-5 py-2 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-90 disabled:opacity-50 cursor-pointer"
+            className="rounded-lg bg-foreground text-background px-5 py-2 text-sm font-medium transition-opacity hover:opacity-80 disabled:opacity-40 cursor-pointer"
           >
             {loading ? "Buscando..." : "Buscar"}
           </button>
