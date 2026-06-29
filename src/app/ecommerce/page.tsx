@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { searchByImage } from "@/lib/api";
+import { API_URL, searchByImage } from "@/lib/api";
 
 type Mode = "upload" | "camera";
 
@@ -293,7 +293,11 @@ export default function Ecommerce() {
           <div className="flex items-center gap-2 rounded-lg bg-surface border border-surface-border px-3 py-2">
             <label className="text-sm text-foreground/60">Resultados</label>
             <button
-              onClick={() => { const n = Math.max(1, k - 1); setK(n); setKRaw(String(n)); }}
+              onClick={() => {
+                const n = Math.max(1, k - 1);
+                setK(n);
+                setKRaw(String(n));
+              }}
               className="flex h-7 w-7 items-center justify-center rounded-md bg-foreground/5 text-sm font-medium hover:bg-foreground/10 transition-colors"
             >
               −
@@ -313,7 +317,11 @@ export default function Ecommerce() {
               className="w-10 text-center text-sm font-medium tabular-nums bg-transparent outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
             />
             <button
-              onClick={() => { const n = Math.min(40, k + 1); setK(n); setKRaw(String(n)); }}
+              onClick={() => {
+                const n = Math.min(40, k + 1);
+                setK(n);
+                setKRaw(String(n));
+              }}
               className="flex h-7 w-7 items-center justify-center rounded-md bg-foreground/5 text-sm font-medium hover:bg-foreground/10 transition-colors"
             >
               +
@@ -347,7 +355,7 @@ export default function Ecommerce() {
           {results.map((path, i) => (
             <img
               key={i}
-              src={`${process.env.NEXT_PUBLIC_API_URL}/media/images/${path}`}
+              src={`${API_URL}/media/images/${path}`}
               alt={`Similar item ${i + 1}`}
               className="aspect-square rounded-lg object-cover transition-transform hover:scale-[1.03]"
             />

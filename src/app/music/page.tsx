@@ -1,9 +1,9 @@
 "use client";
 
-// update backend for webm support 
+// update backend for webm support
 
 import { useEffect, useRef, useState } from "react";
-import { searchByAudio } from "@/lib/api";
+import { API_URL, searchByAudio } from "@/lib/api";
 
 type Mode = "upload" | "record";
 
@@ -318,7 +318,11 @@ export default function Music() {
           <div className="flex items-center gap-2 rounded-lg bg-surface border border-surface-border px-3 py-2">
             <label className="text-sm text-foreground/60">Resultados</label>
             <button
-              onClick={() => { const n = Math.max(1, k - 1); setK(n); setKRaw(String(n)); }}
+              onClick={() => {
+                const n = Math.max(1, k - 1);
+                setK(n);
+                setKRaw(String(n));
+              }}
               className="flex h-7 w-7 items-center justify-center rounded-md bg-foreground/5 text-sm font-medium hover:bg-foreground/10 transition-colors"
             >
               −
@@ -338,7 +342,11 @@ export default function Music() {
               className="w-10 text-center text-sm font-medium tabular-nums bg-transparent outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
             />
             <button
-              onClick={() => { const n = Math.min(40, k + 1); setK(n); setKRaw(String(n)); }}
+              onClick={() => {
+                const n = Math.min(40, k + 1);
+                setK(n);
+                setKRaw(String(n));
+              }}
               className="flex h-7 w-7 items-center justify-center rounded-md bg-foreground/5 text-sm font-medium hover:bg-foreground/10 transition-colors"
             >
               +
@@ -359,10 +367,7 @@ export default function Music() {
       {loading && (
         <div className="flex flex-col gap-3">
           {Array.from({ length: k }).map((_, i) => (
-            <div
-              key={i}
-              className="h-20 animate-pulse rounded-xl bg-surface"
-            />
+            <div key={i} className="h-20 animate-pulse rounded-xl bg-surface" />
           ))}
         </div>
       )}
@@ -389,7 +394,7 @@ export default function Music() {
               </div>
               <audio
                 controls
-                src={`${process.env.NEXT_PUBLIC_API_URL}/${path}`}
+                src={`${API_URL}/media/audios/${path}`}
                 className="w-full h-9"
               />
             </div>
