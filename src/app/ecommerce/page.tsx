@@ -157,7 +157,7 @@ export default function Ecommerce() {
           {results.map((path, i) => (
             <img
               key={i}
-              src={`${process.env.NEXT_PUBLIC_API_URL}/${path}`}
+              src={`${process.env.NEXT_PUBLIC_API_URL}/media/images/${path}`}
               alt={`Similar item ${i + 1}`}
               className="aspect-square rounded-lg object-cover transition-transform hover:scale-[1.03]"
             />
