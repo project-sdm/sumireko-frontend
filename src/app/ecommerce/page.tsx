@@ -1,9 +1,12 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { searchByImage } from "@/lib/api";
 
+type Mode = "upload" | "camera";
+
 export default function Ecommerce() {
+  const [mode, setMode] = useState<Mode>("upload");
   const [preview, setPreview] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [k, setK] = useState(5);
@@ -11,7 +14,18 @@ export default function Ecommerce() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [dragging, setDragging] = useState(false);
+  const [cameraActive, setCameraActive] = useState(false);
+
   const inputRef = useRef<HTMLInputElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+
+  useEffect(() => {
+    return () => {
+      streamRef.current?.getTracks().forEach((t) => t.stop());
+    };
+  }, []);
 
   function handleFile(f: File) {
     setFile(f);
@@ -25,6 +39,66 @@ export default function Ecommerce() {
     setDragging(false);
     const f = e.dataTransfer.files[0];
     if (f?.type.startsWith("image/")) handleFile(f);
+  }
+
+  async function startCamera() {
+    setError(null);
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      streamRef.current = stream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        videoRef.current.play();
+      }
+      setCameraActive(true);
+    } catch {
+      setError("No se pudo acceder a la cámara");
+    }
+  }
+
+  function stopCamera() {
+    streamRef.current?.getTracks().forEach((t) => t.stop());
+    streamRef.current = null;
+    setCameraActive(false);
+  }
+
+  function capturePhoto() {
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    if (!video || !canvas) return;
+
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext("2d")?.drawImage(video, 0, 0);
+
+    canvas.toBlob(
+      (blob) => {
+        if (!blob) return;
+        stopCamera();
+        handleFile(new File([blob], "capture.jpg", { type: "image/jpeg" }));
+      },
+      "image/jpeg",
+      0.92,
+    );
+  }
+
+  function switchMode(m: Mode) {
+    if (m === mode) return;
+    stopCamera();
+    setMode(m);
+    setPreview(null);
+    setFile(null);
+    setResults([]);
+    setError(null);
+  }
+
+  function resetToInput() {
+    setPreview(null);
+    setFile(null);
+    setResults([]);
+    setError(null);
+    if (mode === "camera") startCamera();
+    else inputRef.current?.click();
   }
 
   async function handleSearch() {
@@ -48,47 +122,57 @@ export default function Ecommerce() {
           Búsqueda Visual
         </h1>
         <p className="mt-2 text-sm text-foreground/60">
-          Sube una imagen y encuentra prendas similares en el catálogo
+          Sube una imagen o toma una foto para encontrar prendas similares
         </p>
       </header>
 
-      <section
-        onDragOver={(e) => {
-          e.preventDefault();
-          setDragging(true);
-        }}
-        onDragLeave={() => setDragging(false)}
-        onDrop={handleDrop}
-        onClick={() => inputRef.current?.click()}
-        className={`relative cursor-pointer rounded-xl border-2 border-dashed p-10 text-center transition-colors ${
-          dragging
-            ? "border-accent bg-accent/5"
-            : "border-surface-border hover:border-foreground/30"
-        }`}
-      >
-        <input
-          ref={inputRef}
-          type="file"
-          accept="image/*"
-          className="hidden"
-          onChange={(e) => {
-            const f = e.target.files?.[0];
-            if (f) handleFile(f);
-          }}
-        />
-
-        {preview ? (
-          <div className="flex flex-col items-center gap-3">
-            <img
-              src={preview}
-              alt="Uploaded preview"
-              className="mx-auto max-h-64 rounded-lg object-contain"
-            />
-            <p className="text-xs text-foreground/40">
-              Click para cambiar imagen
-            </p>
+      {/* Mode toggle — hide once we have a preview */}
+      {!preview && (
+        <div className="flex justify-center">
+          <div className="flex rounded-lg bg-surface border border-surface-border p-1 gap-1">
+            {(["upload", "camera"] as Mode[]).map((m) => (
+              <button
+                key={m}
+                onClick={() => switchMode(m)}
+                className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                  mode === m
+                    ? "bg-foreground text-background"
+                    : "text-foreground/60 hover:text-foreground"
+                }`}
+              >
+                {m === "upload" ? "Subir imagen" : "Usar cámara"}
+              </button>
+            ))}
           </div>
-        ) : (
+        </div>
+      )}
+
+      {/* Upload zone */}
+      {mode === "upload" && !preview && (
+        <section
+          onDragOver={(e) => {
+            e.preventDefault();
+            setDragging(true);
+          }}
+          onDragLeave={() => setDragging(false)}
+          onDrop={handleDrop}
+          onClick={() => inputRef.current?.click()}
+          className={`cursor-pointer rounded-xl border-2 border-dashed p-10 text-center transition-colors ${
+            dragging
+              ? "border-accent bg-accent/5"
+              : "border-surface-border hover:border-foreground/30"
+          }`}
+        >
+          <input
+            ref={inputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => {
+              const f = e.target.files?.[0];
+              if (f) handleFile(f);
+            }}
+          />
           <div className="flex flex-col items-center gap-3 text-foreground/50">
             <svg
               className="h-10 w-10"
@@ -106,9 +190,103 @@ export default function Ecommerce() {
             <p className="text-sm">Arrastra una imagen aquí o haz click</p>
             <p className="text-xs">JPG, PNG, WEBP</p>
           </div>
-        )}
-      </section>
+        </section>
+      )}
 
+      {/* Camera viewfinder */}
+      {mode === "camera" && !preview && (
+        <div className="flex flex-col items-center gap-4">
+          <div className="relative w-full rounded-xl overflow-hidden bg-black aspect-video flex items-center justify-center">
+            <video
+              ref={videoRef}
+              autoPlay
+              playsInline
+              muted
+              className={`w-full h-full object-cover transition-opacity ${cameraActive ? "opacity-100" : "opacity-0"}`}
+            />
+            {!cameraActive && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-4">
+                <svg
+                  className="h-10 w-10 text-white/30"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                </svg>
+                <button
+                  onClick={startCamera}
+                  className="rounded-lg bg-white/10 border border-white/20 px-5 py-2 text-sm font-medium text-white hover:bg-white/20 transition-colors"
+                >
+                  Activar cámara
+                </button>
+              </div>
+            )}
+          </div>
+
+          {cameraActive && (
+            <button
+              onClick={capturePhoto}
+              className="flex items-center gap-2 rounded-lg bg-accent px-6 py-2.5 text-sm font-medium text-accent-foreground hover:opacity-90 transition-opacity"
+            >
+              <svg
+                className="h-4 w-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+              </svg>
+              Capturar foto
+            </button>
+          )}
+
+          <canvas ref={canvasRef} className="hidden" />
+        </div>
+      )}
+
+      {/* Preview */}
+      {preview && (
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-full rounded-xl border border-surface-border overflow-hidden">
+            <img
+              src={preview}
+              alt="Preview"
+              className="mx-auto max-h-72 w-full object-contain bg-surface"
+            />
+          </div>
+          <button
+            onClick={resetToInput}
+            className="text-xs text-foreground/40 hover:text-foreground/70 transition-colors"
+          >
+            {mode === "camera" ? "Tomar otra foto" : "Cambiar imagen"}
+          </button>
+        </div>
+      )}
+
+      {/* Controls */}
       {preview && (
         <div className="flex items-center justify-center gap-4">
           <div className="flex items-center gap-2 rounded-lg bg-surface border border-surface-border px-3 py-2">
