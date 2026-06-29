@@ -30,16 +30,29 @@ export default function Ecommerce() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const previewUrlRef = useRef<string | null>(null);
 
   useEffect(() => {
     return () => {
       streamRef.current?.getTracks().forEach((t) => t.stop());
+      if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current);
     };
   }, []);
 
+  function clearPreview() {
+    if (previewUrlRef.current) {
+      URL.revokeObjectURL(previewUrlRef.current);
+      previewUrlRef.current = null;
+    }
+    setPreview(null);
+  }
+
   function handleFile(f: File) {
+    if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current);
+    const url = URL.createObjectURL(f);
+    previewUrlRef.current = url;
     setFile(f);
-    setPreview(URL.createObjectURL(f));
+    setPreview(url);
     setResults([]);
     setError(null);
   }
@@ -95,15 +108,15 @@ export default function Ecommerce() {
   function switchMode(m: Mode) {
     if (m === mode) return;
     stopCamera();
+    clearPreview();
     setMode(m);
-    setPreview(null);
     setFile(null);
     setResults([]);
     setError(null);
   }
 
   function resetToInput() {
-    setPreview(null);
+    clearPreview();
     setFile(null);
     setResults([]);
     setError(null);
