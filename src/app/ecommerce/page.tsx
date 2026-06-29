@@ -4,6 +4,14 @@ import { useEffect, useRef, useState } from "react";
 import { API_URL, searchByImage } from "@/lib/api";
 
 type Mode = "upload" | "camera";
+type SearchMode = "native" | "pg-brute" | "pg-ivf" | "pg-hnsw";
+
+const SEARCH_MODES: { value: SearchMode; label: string }[] = [
+  { value: "native", label: "Nativo" },
+  { value: "pg-brute", label: "Postgres (Fuerza bruta)" },
+  { value: "pg-ivf", label: "Postgres (IVFFlat)" },
+  { value: "pg-hnsw", label: "Postgres (HNSW)" },
+];
 
 export default function Ecommerce() {
   const [mode, setMode] = useState<Mode>("upload");
@@ -16,6 +24,7 @@ export default function Ecommerce() {
   const [error, setError] = useState<string | null>(null);
   const [dragging, setDragging] = useState(false);
   const [cameraActive, setCameraActive] = useState(false);
+  const [searchMode, setSearchMode] = useState<SearchMode>("native");
 
   const inputRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -107,7 +116,7 @@ export default function Ecommerce() {
     setLoading(true);
     setError(null);
     try {
-      const data = await searchByImage(file, k);
+      const data = await searchByImage(file, k, searchMode);
       setResults(data.results);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Search failed");
@@ -289,7 +298,21 @@ export default function Ecommerce() {
 
       {/* Controls */}
       {preview && (
-        <div className="flex items-center justify-center gap-4">
+        <div className="flex items-center justify-center gap-4 flex-wrap">
+          <div className="flex items-center gap-2 rounded-lg bg-surface border border-surface-border px-3 py-2">
+            <label className="text-sm text-foreground/60">Modo</label>
+            <select
+              value={searchMode}
+              onChange={(e) => setSearchMode(e.target.value as SearchMode)}
+              className="bg-transparent text-sm font-medium outline-none cursor-pointer"
+            >
+              {SEARCH_MODES.map((m) => (
+                <option key={m.value} value={m.value}>
+                  {m.label}
+                </option>
+              ))}
+            </select>
+          </div>
           <div className="flex items-center gap-2 rounded-lg bg-surface border border-surface-border px-3 py-2">
             <label className="text-sm text-foreground/60">Resultados</label>
             <button

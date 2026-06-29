@@ -6,6 +6,14 @@ import { useEffect, useRef, useState } from "react";
 import { API_URL, searchByAudio } from "@/lib/api";
 
 type Mode = "upload" | "record";
+type SearchMode = "native" | "pg-brute" | "pg-ivf" | "pg-hnsw";
+
+const SEARCH_MODES: { value: SearchMode; label: string }[] = [
+  { value: "native", label: "Nativo" },
+  { value: "pg-brute", label: "Postgres (Fuerza Bruta)" },
+  { value: "pg-ivf", label: "Postgres (IVFFlat)" },
+  { value: "pg-hnsw", label: "Postgres (HNSW)" },
+];
 
 function parseName(path: string): string {
   return (
@@ -36,6 +44,7 @@ export default function Music() {
   const [dragging, setDragging] = useState(false);
   const [recording, setRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
+  const [searchMode, setSearchMode] = useState<SearchMode>("native");
 
   const inputRef = useRef<HTMLInputElement>(null);
   const recorderRef = useRef<MediaRecorder | null>(null);
@@ -122,7 +131,7 @@ export default function Music() {
     setLoading(true);
     setError(null);
     try {
-      const data = await searchByAudio(file, k);
+      const data = await searchByAudio(file, k, searchMode);
       setResults(data.results);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Search failed");
@@ -314,7 +323,21 @@ export default function Music() {
 
       {/* Controls */}
       {fileName && (
-        <div className="flex items-center justify-center gap-4">
+        <div className="flex items-center justify-center gap-4 flex-wrap">
+          <div className="flex items-center gap-2 rounded-lg bg-surface border border-surface-border px-3 py-2">
+            <label className="text-sm text-foreground/60">Modo</label>
+            <select
+              value={searchMode}
+              onChange={(e) => setSearchMode(e.target.value as SearchMode)}
+              className="bg-transparent text-sm font-medium outline-none cursor-pointer"
+            >
+              {SEARCH_MODES.map((m) => (
+                <option key={m.value} value={m.value}>
+                  {m.label}
+                </option>
+              ))}
+            </select>
+          </div>
           <div className="flex items-center gap-2 rounded-lg bg-surface border border-surface-border px-3 py-2">
             <label className="text-sm text-foreground/60">Resultados</label>
             <button
