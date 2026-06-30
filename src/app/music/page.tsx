@@ -333,7 +333,7 @@ export default function Music() {
             <select
               value={searchMode}
               onChange={(e) => setSearchMode(e.target.value as SearchMode)}
-              className="bg-transparent text-sm font-medium outline-none cursor-pointer"
+              className="bg-transparent text-sm font-medium outline-none cursor-pointer h-7"
             >
               {SEARCH_MODES.map((m) => (
                 <option key={m.value} value={m.value}>
