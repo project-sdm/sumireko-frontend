@@ -26,6 +26,21 @@ function parseName(path: string): string {
   );
 }
 
+const RECORDING_MIME_CANDIDATES = [
+  "audio/webm",
+  "audio/mp4",
+  "audio/ogg",
+];
+
+function pickSupportedMimeType(): string | undefined {
+  if (typeof MediaRecorder === "undefined" || !MediaRecorder.isTypeSupported) {
+    return undefined;
+  }
+  return RECORDING_MIME_CANDIDATES.find((type) =>
+    MediaRecorder.isTypeSupported(type),
+  );
+}
+
 function formatTime(s: number): string {
   const m = Math.floor(s / 60)
     .toString()
@@ -91,7 +106,10 @@ export default function Music() {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       streamRef.current = stream;
 
-      const recorder = new MediaRecorder(stream);
+      const mimeType = pickSupportedMimeType();
+      const recorder = mimeType
+        ? new MediaRecorder(stream, { mimeType })
+        : new MediaRecorder(stream);
       recorderRef.current = recorder;
       chunksRef.current = [];
 
@@ -100,8 +118,10 @@ export default function Music() {
       };
 
       recorder.onstop = () => {
-        const blob = new Blob(chunksRef.current, { type: "audio/webm" });
-        handleFile(new File([blob], "recording.webm", { type: "audio/webm" }));
+        const type = recorder.mimeType || "audio/webm";
+        const ext = type.split("/")[1]?.split(";")[0] || "webm";
+        const blob = new Blob(chunksRef.current, { type });
+        handleFile(new File([blob], `recording.${ext}`, { type }));
         streamRef.current?.getTracks().forEach((t) => t.stop());
         streamRef.current = null;
       };
