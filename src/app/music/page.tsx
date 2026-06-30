@@ -86,7 +86,12 @@ export default function Music() {
     e.preventDefault();
     setDragging(false);
     const f = e.dataTransfer.files[0];
-    if (f?.type.startsWith("audio/")) handleFile(f);
+    if (!f) return;
+    if (f.type.startsWith("audio/")) {
+      handleFile(f);
+    } else {
+      setError("El archivo debe ser un audio");
+    }
   }
 
   function switchMode(m: Mode) {

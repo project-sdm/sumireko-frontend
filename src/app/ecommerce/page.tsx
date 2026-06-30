@@ -62,7 +62,12 @@ export default function Ecommerce() {
     e.preventDefault();
     setDragging(false);
     const f = e.dataTransfer.files[0];
-    if (f?.type.startsWith("image/")) handleFile(f);
+    if (!f) return;
+    if (f.type.startsWith("image/")) {
+      handleFile(f);
+    } else {
+      setError("El archivo debe ser una imagen");
+    }
   }
 
   async function startCamera() {
