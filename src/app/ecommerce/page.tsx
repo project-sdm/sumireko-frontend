@@ -126,10 +126,13 @@ export default function Ecommerce() {
 
   async function handleSearch() {
     if (!file) return;
+    const committed = Math.min(40, Math.max(1, parseInt(kRaw, 10) || k));
+    setK(committed);
+    setKRaw(String(committed));
     setLoading(true);
     setError(null);
     try {
-      const data = await searchByImage(file, k, searchMode);
+      const data = await searchByImage(file, committed, searchMode);
       setResults(data.results);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Search failed");
