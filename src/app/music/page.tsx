@@ -163,7 +163,7 @@ export default function Music() {
       const data = await searchByAudio(file, committed, searchMode);
       setResults(data.results);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Search failed");
+      setError(err instanceof Error ? err.message : "Error al buscar");
     } finally {
       setLoading(false);
     }

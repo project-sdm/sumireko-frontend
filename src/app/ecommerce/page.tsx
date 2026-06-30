@@ -141,7 +141,7 @@ export default function Ecommerce() {
       const data = await searchByImage(file, committed, searchMode);
       setResults(data.results);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Search failed");
+      setError(err instanceof Error ? err.message : "Error al buscar");
     } finally {
       setLoading(false);
     }
