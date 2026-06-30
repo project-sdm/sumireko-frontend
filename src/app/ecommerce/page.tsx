@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { API_URL, searchByImage } from "@/lib/api";
+import { KSelector } from "@/components/KSelector";
 
 type Mode = "upload" | "camera";
 type SearchMode = "native" | "pg-brute" | "pg-ivf" | "pg-hnsw";
@@ -329,43 +330,12 @@ export default function Ecommerce() {
               ))}
             </select>
           </div>
-          <div className="flex items-center gap-2 rounded-lg bg-surface border border-surface-border px-3 py-2">
-            <label className="text-sm text-foreground/60">Resultados</label>
-            <button
-              onClick={() => {
-                const n = Math.max(1, k - 1);
-                setK(n);
-                setKRaw(String(n));
-              }}
-              className="flex h-7 w-7 items-center justify-center rounded-md bg-foreground/5 text-sm font-medium hover:bg-foreground/10 transition-colors"
-            >
-              −
-            </button>
-            <input
-              type="number"
-              min={1}
-              max={40}
-              value={kRaw}
-              onChange={(e) => setKRaw(e.target.value)}
-              onBlur={() => {
-                const v = parseInt(kRaw, 10);
-                const clamped = isNaN(v) ? k : Math.min(40, Math.max(1, v));
-                setK(clamped);
-                setKRaw(String(clamped));
-              }}
-              className="w-10 text-center text-sm font-medium tabular-nums bg-transparent outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-            />
-            <button
-              onClick={() => {
-                const n = Math.min(40, k + 1);
-                setK(n);
-                setKRaw(String(n));
-              }}
-              className="flex h-7 w-7 items-center justify-center rounded-md bg-foreground/5 text-sm font-medium hover:bg-foreground/10 transition-colors"
-            >
-              +
-            </button>
-          </div>
+          <KSelector
+            value={k}
+            rawValue={kRaw}
+            onValueChange={setK}
+            onRawChange={setKRaw}
+          />
           <button
             onClick={handleSearch}
             disabled={loading}
