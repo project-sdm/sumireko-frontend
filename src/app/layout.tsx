@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import "./globals.css";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
@@ -23,8 +24,16 @@ export default function RootLayout({
   return (
     <html
       lang="es"
+      suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('theme')||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.classList.add(t);}catch(e){}})();`,
+          }}
+        />
+      </head>
       <body className="min-h-full flex flex-col bg-background text-foreground">
         <header className="border-b border-surface-border">
           <nav className="mx-auto max-w-5xl px-4 h-14 flex items-center justify-between">
@@ -34,25 +43,28 @@ export default function RootLayout({
             >
               Sumireko
             </Link>
-            <div className="flex gap-6 text-sm text-foreground/60">
-              <Link
-                href="/text"
-                className="hover:text-foreground transition-colors"
-              >
-                Texto
-              </Link>
-              <Link
-                href="/ecommerce"
-                className="hover:text-foreground transition-colors"
-              >
-                E-Commerce
-              </Link>
-              <Link
-                href="/music"
-                className="hover:text-foreground transition-colors"
-              >
-                Música
-              </Link>
+            <div className="flex items-center gap-6">
+              <div className="flex gap-6 text-sm text-foreground/60">
+                <Link
+                  href="/text"
+                  className="hover:text-foreground transition-colors"
+                >
+                  Texto
+                </Link>
+                <Link
+                  href="/ecommerce"
+                  className="hover:text-foreground transition-colors"
+                >
+                  E-Commerce
+                </Link>
+                <Link
+                  href="/music"
+                  className="hover:text-foreground transition-colors"
+                >
+                  Música
+                </Link>
+              </div>
+              <ThemeToggle />
             </div>
           </nav>
         </header>
