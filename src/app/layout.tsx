@@ -12,7 +12,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Sumireko",
   description:
-    "Sistema multimodal de recuperación por similitud: imágenes y audio.",
+    "Sistema multimodal de recuperación por similitud: texto, imágenes y audio.",
 };
 
 export default function RootLayout({

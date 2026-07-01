@@ -78,11 +78,11 @@ export default function Home() {
       <div className="text-center flex flex-col gap-3">
         <h1 className="text-5xl font-semibold tracking-tight">Sumireko</h1>
         <p className="text-foreground/60">
-          Sistema multimodal de recuperación por similitud
+          Sistema multimodal de recuperación y búsqueda
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 w-full">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 w-full">
         {apps.map((app) => (
           <Link
             key={app.href}
