@@ -17,11 +17,14 @@ export default function Text() {
 
   async function handleSearch() {
     if (!query.trim()) return;
+    const committed = Math.min(40, Math.max(1, parseInt(kRaw, 10) || k));
+    setK(committed);
+    setKRaw(String(committed));
     setLoading(true);
     setError(null);
     setTimeMs(null);
     try {
-      const data = await searchByText(query, 5, language);
+      const data = await searchByText(query, committed, language);
       setResults(data.results);
       setTimeMs(data.time_ms);
     } catch (err) {
