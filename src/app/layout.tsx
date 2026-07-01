@@ -36,6 +36,12 @@ export default function RootLayout({
             </Link>
             <div className="flex gap-6 text-sm text-foreground/60">
               <Link
+                href="/text"
+                className="hover:text-foreground transition-colors"
+              >
+                Texto
+              </Link>
+              <Link
                 href="/ecommerce"
                 className="hover:text-foreground transition-colors"
               >
