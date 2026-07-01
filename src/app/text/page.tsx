@@ -6,6 +6,7 @@ import { BackLink } from "@/components/BackLink";
 
 export default function Text() {
   const [query, setQuery] = useState("");
+  const [language, setLanguage] = useState("english");
   const [results, setResults] = useState<string[]>([]);
   const [timeMs, setTimeMs] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
@@ -17,7 +18,7 @@ export default function Text() {
     setError(null);
     setTimeMs(null);
     try {
-      const data = await searchByText(query);
+      const data = await searchByText(query, 5, language);
       setResults(data.results);
       setTimeMs(data.time_ms);
     } catch (err) {
@@ -41,6 +42,15 @@ export default function Text() {
       </header>
 
       <div className="flex gap-2">
+        <select
+          value={language}
+          onChange={(e) => setLanguage(e.target.value)}
+          className="rounded-lg bg-surface border border-surface-border px-3 py-2 text-sm font-medium outline-none cursor-pointer"
+        >
+          <option value="english">Inglés</option>
+          <option value="spanish">Español</option>
+          <option value="multilingual">Multilingüe</option>
+        </select>
         <input
           type="text"
           value={query}
