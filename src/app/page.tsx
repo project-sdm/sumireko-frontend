@@ -104,6 +104,13 @@ export default function Home() {
           </Link>
         ))}
       </div>
+
+      <Link
+        href="/manual"
+        className="text-sm text-foreground/50 hover:text-accent transition-colors"
+      >
+        ¿Primera vez? Lee el manual de usuario →
+      </Link>
     </main>
   );
 }

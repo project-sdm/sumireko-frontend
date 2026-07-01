@@ -73,6 +73,31 @@ export default function Manual() {
           </li>
         </ol>
       </section>
+
+      <section className="flex flex-col gap-3">
+        <h2 className="text-lg font-medium">Búsqueda musical</h2>
+        <p className="text-sm text-foreground/70 leading-relaxed">
+          Sube un archivo de audio y encuentra las canciones más parecidas por
+          sus características acústicas (MFCC) y un diccionario de palabras
+          acústicas.
+        </p>
+        <ol className="flex flex-col gap-2 text-sm text-foreground/70 list-decimal pl-5">
+          <li>
+            Arrastra un audio a la zona de subida, haz clic para elegir un
+            archivo, o graba directamente desde tu micrófono.
+          </li>
+          <li>
+            Elige el modo de búsqueda (<span className="font-medium text-foreground">Nativo</span>{" "}
+            o Postgres) y el número de resultados (
+            <span className="font-mono">k</span>).
+          </li>
+          <li>
+            Presiona <span className="font-medium text-foreground">Buscar</span>.
+            Cada resultado incluye un reproductor para escuchar la canción y la
+            latencia de la consulta.
+          </li>
+        </ol>
+      </section>
     </main>
   );
 }
