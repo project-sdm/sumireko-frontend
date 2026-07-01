@@ -7,6 +7,7 @@ import { API_URL, searchByAudio } from "@/lib/api";
 import { useSearch } from "@/lib/useSearch";
 import { KSelector } from "@/components/KSelector";
 import { BackLink } from "@/components/BackLink";
+import { UploadDropzone } from "@/components/UploadDropzone";
 import { SEARCH_MODES, type SearchMode } from "@/lib/searchModes";
 
 type Mode = "upload" | "record";
@@ -58,12 +59,10 @@ export default function Music() {
     reset: resetSearch,
     setError,
   } = useSearch();
-  const [dragging, setDragging] = useState(false);
   const [recording, setRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const [searchMode, setSearchMode] = useState<SearchMode>("native");
 
-  const inputRef = useRef<HTMLInputElement>(null);
   const recorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<BlobPart[]>([]);
   const streamRef = useRef<MediaStream | null>(null);
@@ -80,18 +79,6 @@ export default function Music() {
     setFile(f);
     setFileName(f.name);
     resetSearch();
-  }
-
-  function handleDrop(e: React.DragEvent) {
-    e.preventDefault();
-    setDragging(false);
-    const f = e.dataTransfer.files[0];
-    if (!f) return;
-    if (f.type.startsWith("audio/")) {
-      handleFile(f);
-    } else {
-      setError("El archivo debe ser un audio");
-    }
   }
 
   function switchMode(m: Mode) {
@@ -203,31 +190,14 @@ export default function Music() {
 
       {/* Upload zone */}
       {mode === "upload" && !fileName && (
-        <section
-          onDragOver={(e) => {
-            e.preventDefault();
-            setDragging(true);
-          }}
-          onDragLeave={() => setDragging(false)}
-          onDrop={handleDrop}
-          onClick={() => inputRef.current?.click()}
-          className={`cursor-pointer rounded-xl border-2 border-dashed p-10 text-center transition-colors ${
-            dragging
-              ? "border-accent bg-accent/5"
-              : "border-surface-border hover:border-foreground/30"
-          }`}
-        >
-          <input
-            ref={inputRef}
-            type="file"
-            accept="audio/*"
-            className="hidden"
-            onChange={(e) => {
-              const f = e.target.files?.[0];
-              if (f) handleFile(f);
-            }}
-          />
-          <div className="flex flex-col items-center gap-3 text-foreground/50">
+        <UploadDropzone
+          accept="audio/*"
+          title="Arrastra un audio aquí o haz click"
+          hint="MP3, WAV, OGG, FLAC"
+          onFile={handleFile}
+          onInvalid={setError}
+          invalidMessage="El archivo debe ser un audio"
+          icon={
             <svg
               className="h-10 w-10"
               fill="none"
@@ -241,10 +211,8 @@ export default function Music() {
                 d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z"
               />
             </svg>
-            <p className="text-sm">Arrastra un audio aquí o haz click</p>
-            <p className="text-xs">MP3, WAV, OGG, FLAC</p>
-          </div>
-        </section>
+          }
+        />
       )}
 
       {/* Recording zone */}

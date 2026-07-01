@@ -5,6 +5,7 @@ import { API_URL, searchByImage } from "@/lib/api";
 import { useSearch } from "@/lib/useSearch";
 import { KSelector } from "@/components/KSelector";
 import { BackLink } from "@/components/BackLink";
+import { UploadDropzone } from "@/components/UploadDropzone";
 import { SEARCH_MODES, type SearchMode } from "@/lib/searchModes";
 
 type Mode = "upload" | "camera";
@@ -16,11 +17,9 @@ export default function Ecommerce() {
   const [k, setK] = useState(5);
   const [kRaw, setKRaw] = useState("5");
   const { results, timeMs, loading, error, run, reset, setError } = useSearch();
-  const [dragging, setDragging] = useState(false);
   const [cameraActive, setCameraActive] = useState(false);
   const [searchMode, setSearchMode] = useState<SearchMode>("native");
 
-  const inputRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -48,18 +47,6 @@ export default function Ecommerce() {
     setFile(f);
     setPreview(url);
     reset();
-  }
-
-  function handleDrop(e: React.DragEvent) {
-    e.preventDefault();
-    setDragging(false);
-    const f = e.dataTransfer.files[0];
-    if (!f) return;
-    if (f.type.startsWith("image/")) {
-      handleFile(f);
-    } else {
-      setError("El archivo debe ser una imagen");
-    }
   }
 
   async function startCamera() {
@@ -117,7 +104,6 @@ export default function Ecommerce() {
     setFile(null);
     reset();
     if (mode === "camera") startCamera();
-    else inputRef.current?.click();
   }
 
   async function handleSearch() {
@@ -164,31 +150,14 @@ export default function Ecommerce() {
 
       {/* Upload zone */}
       {mode === "upload" && !preview && (
-        <section
-          onDragOver={(e) => {
-            e.preventDefault();
-            setDragging(true);
-          }}
-          onDragLeave={() => setDragging(false)}
-          onDrop={handleDrop}
-          onClick={() => inputRef.current?.click()}
-          className={`cursor-pointer rounded-xl border-2 border-dashed p-10 text-center transition-colors ${
-            dragging
-              ? "border-accent bg-accent/5"
-              : "border-surface-border hover:border-foreground/30"
-          }`}
-        >
-          <input
-            ref={inputRef}
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={(e) => {
-              const f = e.target.files?.[0];
-              if (f) handleFile(f);
-            }}
-          />
-          <div className="flex flex-col items-center gap-3 text-foreground/50">
+        <UploadDropzone
+          accept="image/*"
+          title="Arrastra una imagen aquí o haz click"
+          hint="JPG, PNG, WEBP"
+          onFile={handleFile}
+          onInvalid={setError}
+          invalidMessage="El archivo debe ser una imagen"
+          icon={
             <svg
               className="h-10 w-10"
               fill="none"
@@ -202,10 +171,8 @@ export default function Ecommerce() {
                 d="M12 4v16m8-8H4"
               />
             </svg>
-            <p className="text-sm">Arrastra una imagen aquí o haz click</p>
-            <p className="text-xs">JPG, PNG, WEBP</p>
-          </div>
-        </section>
+          }
+        />
       )}
 
       {/* Camera viewfinder */}
