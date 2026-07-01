@@ -90,7 +90,7 @@ export default function Text() {
             {results.map((name, i) => (
               <li
                 key={i}
-                className="flex items-center gap-3 rounded-lg bg-surface border border-surface-border p-3 text-sm"
+                className="flex items-center gap-3 rounded-lg bg-surface border border-surface-border p-3 text-sm shadow-soft transition-colors hover:border-accent/40"
               >
                 <span className="w-5 text-right text-xs text-foreground/30 tabular-nums">
                   {i + 1}

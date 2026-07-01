@@ -315,7 +315,7 @@ export default function Ecommerce() {
                 key={i}
                 src={`${API_URL}/media/images/${path}`}
                 alt={`Similar item ${i + 1}`}
-                className="aspect-square rounded-lg object-cover transition-transform hover:scale-[1.03]"
+                className="aspect-square rounded-lg border border-surface-border object-cover shadow-soft transition-all hover:scale-[1.03] hover:shadow-lg"
               />
             ))}
           </div>

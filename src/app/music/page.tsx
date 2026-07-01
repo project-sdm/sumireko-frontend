@@ -342,7 +342,7 @@ export default function Music() {
           {results.map((path, i) => (
             <div
               key={i}
-              className="flex flex-col gap-3 rounded-xl bg-surface border border-surface-border p-4"
+              className="flex flex-col gap-3 rounded-xl bg-surface border border-surface-border p-4 shadow-soft transition-colors hover:border-accent/40"
             >
               <div className="flex items-center gap-3">
                 <span className="text-xs text-foreground/30 tabular-nums w-5 text-right">
