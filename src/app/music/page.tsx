@@ -316,7 +316,7 @@ export default function Music() {
       {/* File ready chip */}
       {fileName && (
         <div className="flex items-center gap-3 rounded-xl border border-surface-border bg-surface p-4">
-          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-accent/10 text-accent">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent/10 text-accent">
             <svg
               className="h-5 w-5"
               fill="none"
@@ -339,7 +339,7 @@ export default function Music() {
           </div>
           <button
             onClick={reset}
-            className="text-xs text-foreground/40 hover:text-foreground/70 transition-colors flex-shrink-0"
+            className="text-xs text-foreground/40 hover:text-foreground/70 transition-colors shrink-0"
           >
             Cambiar
           </button>
