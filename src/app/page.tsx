@@ -49,6 +49,27 @@ const apps = [
       </svg>
     ),
   },
+  {
+    href: "/text",
+    title: "Búsqueda de Texto",
+    description:
+      "Escribe una consulta y encuentra los documentos más relevantes usando el índice invertido TF-IDF.",
+    icon: (
+      <svg
+        className="h-8 w-8"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={1.5}
+          d="M21 21l-5.2-5.2m0 0A7.5 7.5 0 105.2 5.2a7.5 7.5 0 0010.6 10.6z"
+        />
+      </svg>
+    ),
+  },
 ];
 
 export default function Home() {
