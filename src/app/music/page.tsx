@@ -9,18 +9,9 @@ import { KSelector } from "@/components/KSelector";
 import { BackLink } from "@/components/BackLink";
 import { UploadDropzone } from "@/components/UploadDropzone";
 import { SEARCH_MODES, type SearchMode } from "@/lib/searchModes";
+import { parseName } from "@/lib/format";
 
 type Mode = "upload" | "record";
-
-function parseName(path: string): string {
-  return (
-    path
-      .split("/")
-      .pop()
-      ?.replace(/\.[^.]+$/, "")
-      .replace(/[_-]/g, " ") ?? path
-  );
-}
 
 const RECORDING_MIME_CANDIDATES = [
   "audio/webm",
