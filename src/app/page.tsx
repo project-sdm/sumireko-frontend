@@ -87,9 +87,9 @@ export default function Home() {
           <Link
             key={app.href}
             href={app.href}
-            className="group flex flex-col gap-4 rounded-xl border border-surface-border bg-surface p-7 hover:border-foreground/20 transition-colors"
+            className="group flex flex-col gap-4 rounded-xl border border-surface-border bg-surface p-7 shadow-soft hover:-translate-y-0.5 hover:border-accent/40 hover:shadow-lg transition-all duration-200"
           >
-            <span className="text-foreground/50 group-hover:text-accent transition-colors">
+            <span className="flex h-12 w-12 items-center justify-center rounded-lg bg-surface-2 text-foreground/50 group-hover:bg-accent/10 group-hover:text-accent transition-colors">
               {app.icon}
             </span>
             <div className="flex flex-col gap-1">
@@ -98,8 +98,11 @@ export default function Home() {
                 {app.description}
               </p>
             </div>
-            <span className="text-xs text-foreground/40 group-hover:text-accent transition-colors mt-auto">
-              Explorar →
+            <span className="mt-auto inline-flex items-center gap-1 text-xs text-foreground/40 group-hover:text-accent transition-colors">
+              Explorar
+              <span className="transition-transform group-hover:translate-x-0.5">
+                →
+              </span>
             </span>
           </Link>
         ))}
