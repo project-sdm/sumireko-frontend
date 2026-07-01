@@ -4,6 +4,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { API_URL, searchByAudio } from "@/lib/api";
+import { useSearch } from "@/lib/useSearch";
 import { KSelector } from "@/components/KSelector";
 import { BackLink } from "@/components/BackLink";
 import { SEARCH_MODES, type SearchMode } from "@/lib/searchModes";
@@ -48,10 +49,15 @@ export default function Music() {
   const [fileName, setFileName] = useState<string | null>(null);
   const [k, setK] = useState(5);
   const [kRaw, setKRaw] = useState("5");
-  const [results, setResults] = useState<string[]>([]);
-  const [timeMs, setTimeMs] = useState<number | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const {
+    results,
+    timeMs,
+    loading,
+    error,
+    run,
+    reset: resetSearch,
+    setError,
+  } = useSearch();
   const [dragging, setDragging] = useState(false);
   const [recording, setRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
@@ -73,8 +79,7 @@ export default function Music() {
   function handleFile(f: File) {
     setFile(f);
     setFileName(f.name);
-    setResults([]);
-    setError(null);
+    resetSearch();
   }
 
   function handleDrop(e: React.DragEvent) {
@@ -95,8 +100,7 @@ export default function Music() {
     setMode(m);
     setFile(null);
     setFileName(null);
-    setResults([]);
-    setError(null);
+    resetSearch();
     setRecordingTime(0);
   }
 
@@ -152,25 +156,13 @@ export default function Music() {
     const committed = Math.min(40, Math.max(1, parseInt(kRaw, 10) || k));
     setK(committed);
     setKRaw(String(committed));
-    setLoading(true);
-    setError(null);
-    setTimeMs(null);
-    try {
-      const data = await searchByAudio(file, committed, searchMode);
-      setResults(data.results);
-      setTimeMs(data.time_ms);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Error al buscar");
-    } finally {
-      setLoading(false);
-    }
+    await run(() => searchByAudio(file, committed, searchMode));
   }
 
   function reset() {
     setFile(null);
     setFileName(null);
-    setResults([]);
-    setError(null);
+    resetSearch();
     setRecordingTime(0);
   }
 

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { searchByText } from "@/lib/api";
+import { useSearch } from "@/lib/useSearch";
 import { BackLink } from "@/components/BackLink";
 import { KSelector } from "@/components/KSelector";
 
@@ -10,28 +11,14 @@ export default function Text() {
   const [language, setLanguage] = useState("english");
   const [k, setK] = useState(5);
   const [kRaw, setKRaw] = useState("5");
-  const [results, setResults] = useState<string[]>([]);
-  const [timeMs, setTimeMs] = useState<number | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { results, timeMs, loading, error, run } = useSearch();
 
   async function handleSearch() {
     if (!query.trim()) return;
     const committed = Math.min(40, Math.max(1, parseInt(kRaw, 10) || k));
     setK(committed);
     setKRaw(String(committed));
-    setLoading(true);
-    setError(null);
-    setTimeMs(null);
-    try {
-      const data = await searchByText(query, committed, language);
-      setResults(data.results);
-      setTimeMs(data.time_ms);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Error al buscar");
-    } finally {
-      setLoading(false);
-    }
+    await run(() => searchByText(query, committed, language));
   }
 
   return (

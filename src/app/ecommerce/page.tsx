@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { API_URL, searchByImage } from "@/lib/api";
+import { useSearch } from "@/lib/useSearch";
 import { KSelector } from "@/components/KSelector";
 import { BackLink } from "@/components/BackLink";
 import { SEARCH_MODES, type SearchMode } from "@/lib/searchModes";
@@ -14,10 +15,7 @@ export default function Ecommerce() {
   const [file, setFile] = useState<File | null>(null);
   const [k, setK] = useState(5);
   const [kRaw, setKRaw] = useState("5");
-  const [results, setResults] = useState<string[]>([]);
-  const [timeMs, setTimeMs] = useState<number | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { results, timeMs, loading, error, run, reset, setError } = useSearch();
   const [dragging, setDragging] = useState(false);
   const [cameraActive, setCameraActive] = useState(false);
   const [searchMode, setSearchMode] = useState<SearchMode>("native");
@@ -49,8 +47,7 @@ export default function Ecommerce() {
     previewUrlRef.current = url;
     setFile(f);
     setPreview(url);
-    setResults([]);
-    setError(null);
+    reset();
   }
 
   function handleDrop(e: React.DragEvent) {
@@ -112,15 +109,13 @@ export default function Ecommerce() {
     clearPreview();
     setMode(m);
     setFile(null);
-    setResults([]);
-    setError(null);
+    reset();
   }
 
   function resetToInput() {
     clearPreview();
     setFile(null);
-    setResults([]);
-    setError(null);
+    reset();
     if (mode === "camera") startCamera();
     else inputRef.current?.click();
   }
@@ -130,18 +125,7 @@ export default function Ecommerce() {
     const committed = Math.min(40, Math.max(1, parseInt(kRaw, 10) || k));
     setK(committed);
     setKRaw(String(committed));
-    setLoading(true);
-    setError(null);
-    setTimeMs(null);
-    try {
-      const data = await searchByImage(file, committed, searchMode);
-      setResults(data.results);
-      setTimeMs(data.time_ms);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Error al buscar");
-    } finally {
-      setLoading(false);
-    }
+    await run(() => searchByImage(file, committed, searchMode));
   }
 
   return (
