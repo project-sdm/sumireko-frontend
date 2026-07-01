@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CameraIcon, MusicNoteIcon } from "@/components/icons";
 
 const apps = [
   {
@@ -6,48 +7,14 @@ const apps = [
     title: "Búsqueda Visual",
     description:
       "Sube una imagen de prenda y encuentra los productos más similares del catálogo.",
-    icon: (
-      <svg
-        className="h-8 w-8"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={1.5}
-          d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
-        />
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={1.5}
-          d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
-        />
-      </svg>
-    ),
+    icon: <CameraIcon className="h-8 w-8" />,
   },
   {
     href: "/music",
     title: "Búsqueda Musical",
     description:
       "Sube un archivo de audio y encuentra las canciones más similares por características acústicas MFCC.",
-    icon: (
-      <svg
-        className="h-8 w-8"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={1.5}
-          d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z"
-        />
-      </svg>
-    ),
+    icon: <MusicNoteIcon className="h-8 w-8" />,
   },
   {
     href: "/text",

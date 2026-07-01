@@ -12,6 +12,7 @@ import { UploadDropzone } from "@/components/UploadDropzone";
 import { SearchModeSelector } from "@/components/SearchModeSelector";
 import { type SearchMode } from "@/lib/searchModes";
 import { parseName } from "@/lib/format";
+import { MusicNoteIcon } from "@/components/icons";
 
 type Mode = "upload" | "record";
 
@@ -153,21 +154,7 @@ export default function Music() {
       <PageHeader
         title="Búsqueda Musical"
         subtitle="Sube un audio o graba desde tu micrófono para encontrar canciones similares"
-        icon={
-          <svg
-            className="h-6 w-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={1.5}
-              d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z"
-            />
-          </svg>
-        }
+        icon={<MusicNoteIcon className="h-6 w-6" />}
       />
 
       {/* Mode toggle — hide once a file is ready */}
@@ -200,21 +187,7 @@ export default function Music() {
           onFile={handleFile}
           onInvalid={setError}
           invalidMessage="El archivo debe ser un audio"
-          icon={
-            <svg
-              className="h-10 w-10"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={1.5}
-                d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z"
-              />
-            </svg>
-          }
+          icon={<MusicNoteIcon className="h-10 w-10" />}
         />
       )}
 
@@ -283,19 +256,7 @@ export default function Music() {
       {fileName && (
         <div className="flex items-center gap-3 rounded-xl border border-surface-border bg-surface p-4">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent/10 text-accent">
-            <svg
-              className="h-5 w-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={1.5}
-                d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z"
-              />
-            </svg>
+            <MusicNoteIcon className="h-5 w-5" />
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium truncate">{fileName}</p>
