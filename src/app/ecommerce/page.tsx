@@ -3,16 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 import { API_URL, searchByImage } from "@/lib/api";
 import { KSelector } from "@/components/KSelector";
+import { SEARCH_MODES, type SearchMode } from "@/lib/searchModes";
 
 type Mode = "upload" | "camera";
-type SearchMode = "native" | "pg-brute" | "pg-ivf" | "pg-hnsw";
-
-const SEARCH_MODES: { value: SearchMode; label: string }[] = [
-  { value: "native", label: "Nativo" },
-  { value: "pg-brute", label: "Postgres (Fuerza Bruta)" },
-  { value: "pg-ivf", label: "Postgres (IVFFlat)" },
-  { value: "pg-hnsw", label: "Postgres (HNSW)" },
-];
 
 export default function Ecommerce() {
   const [mode, setMode] = useState<Mode>("upload");

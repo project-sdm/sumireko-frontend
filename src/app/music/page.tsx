@@ -5,16 +5,9 @@
 import { useEffect, useRef, useState } from "react";
 import { API_URL, searchByAudio } from "@/lib/api";
 import { KSelector } from "@/components/KSelector";
+import { SEARCH_MODES, type SearchMode } from "@/lib/searchModes";
 
 type Mode = "upload" | "record";
-type SearchMode = "native" | "pg-brute" | "pg-ivf" | "pg-hnsw";
-
-const SEARCH_MODES: { value: SearchMode; label: string }[] = [
-  { value: "native", label: "Nativo" },
-  { value: "pg-brute", label: "Postgres (Fuerza Bruta)" },
-  { value: "pg-ivf", label: "Postgres (IVFFlat)" },
-  { value: "pg-hnsw", label: "Postgres (HNSW)" },
-];
 
 function parseName(path: string): string {
   return (
