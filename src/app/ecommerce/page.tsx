@@ -6,7 +6,8 @@ import { useSearch } from "@/lib/useSearch";
 import { KSelector } from "@/components/KSelector";
 import { BackLink } from "@/components/BackLink";
 import { UploadDropzone } from "@/components/UploadDropzone";
-import { SEARCH_MODES, type SearchMode } from "@/lib/searchModes";
+import { SearchModeSelector } from "@/components/SearchModeSelector";
+import { type SearchMode } from "@/lib/searchModes";
 
 type Mode = "upload" | "camera";
 
@@ -271,20 +272,7 @@ export default function Ecommerce() {
       {/* Controls */}
       {preview && (
         <div className="flex items-center justify-center gap-4 flex-wrap">
-          <div className="flex items-center gap-2 rounded-lg bg-surface border border-surface-border px-3 py-2">
-            <label className="text-sm text-foreground/60">Modo</label>
-            <select
-              value={searchMode}
-              onChange={(e) => setSearchMode(e.target.value as SearchMode)}
-              className="bg-transparent text-sm font-medium outline-none cursor-pointer h-7"
-            >
-              {SEARCH_MODES.map((m) => (
-                <option key={m.value} value={m.value}>
-                  {m.label}
-                </option>
-              ))}
-            </select>
-          </div>
+          <SearchModeSelector value={searchMode} onChange={setSearchMode} />
           <KSelector
             value={k}
             rawValue={kRaw}
