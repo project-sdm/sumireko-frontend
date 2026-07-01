@@ -3,10 +3,13 @@
 import { useState } from "react";
 import { searchByText } from "@/lib/api";
 import { BackLink } from "@/components/BackLink";
+import { KSelector } from "@/components/KSelector";
 
 export default function Text() {
   const [query, setQuery] = useState("");
   const [language, setLanguage] = useState("english");
+  const [k, setK] = useState(5);
+  const [kRaw, setKRaw] = useState("5");
   const [results, setResults] = useState<string[]>([]);
   const [timeMs, setTimeMs] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
@@ -66,6 +69,15 @@ export default function Text() {
         >
           {loading ? "Buscando..." : "Buscar"}
         </button>
+      </div>
+
+      <div className="flex justify-center">
+        <KSelector
+          value={k}
+          rawValue={kRaw}
+          onValueChange={setK}
+          onRawChange={setKRaw}
+        />
       </div>
 
       {error && <p className="text-center text-sm text-red-500">{error}</p>}
