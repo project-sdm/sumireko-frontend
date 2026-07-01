@@ -99,6 +99,11 @@ export default function Text() {
             {results.length} resultado{results.length !== 1 ? "s" : ""} en{" "}
             {timeMs} ms
           </p>
+          {results.length === 0 && (
+            <p className="text-center text-sm text-foreground/50 py-6">
+              No se encontraron documentos para tu consulta.
+            </p>
+          )}
           <ul className="flex flex-col gap-2">
             {results.map((name, i) => (
               <li
