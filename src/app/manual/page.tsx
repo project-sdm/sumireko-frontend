@@ -17,6 +17,34 @@ export default function Manual() {
           Cómo usar cada modalidad de búsqueda del sistema
         </p>
       </header>
+
+      <section className="flex flex-col gap-3">
+        <h2 className="text-lg font-medium">Búsqueda de texto</h2>
+        <p className="text-sm text-foreground/70 leading-relaxed">
+          Encuentra los documentos más relevantes para una consulta usando el
+          índice invertido TF-IDF.
+        </p>
+        <ol className="flex flex-col gap-2 text-sm text-foreground/70 list-decimal pl-5">
+          <li>
+            Escribe tu consulta en el campo de texto (por ejemplo,{" "}
+            <span className="font-medium text-foreground">machine learning</span>
+            ).
+          </li>
+          <li>
+            Elige el idioma del corpus (Inglés, Español o Multilingüe) para
+            tokenizar y eliminar stopwords correctamente.
+          </li>
+          <li>
+            Ajusta el número de resultados (<span className="font-mono">k</span>)
+            con el selector.
+          </li>
+          <li>
+            Presiona <span className="font-medium text-foreground">Buscar</span>{" "}
+            o Enter. Verás los documentos ordenados por relevancia junto con la
+            latencia de la consulta.
+          </li>
+        </ol>
+      </section>
     </main>
   );
 }
