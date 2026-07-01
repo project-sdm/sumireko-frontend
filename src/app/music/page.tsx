@@ -48,6 +48,7 @@ export default function Music() {
   const [k, setK] = useState(5);
   const [kRaw, setKRaw] = useState("5");
   const [results, setResults] = useState<string[]>([]);
+  const [timeMs, setTimeMs] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [dragging, setDragging] = useState(false);
@@ -152,9 +153,11 @@ export default function Music() {
     setKRaw(String(committed));
     setLoading(true);
     setError(null);
+    setTimeMs(null);
     try {
       const data = await searchByAudio(file, committed, searchMode);
       setResults(data.results);
+      setTimeMs(data.time_ms);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error al buscar");
     } finally {
@@ -388,10 +391,11 @@ export default function Music() {
 
       {!loading && results.length > 0 && (
         <div className="flex flex-col gap-3">
-          <p className="text-xs text-foreground/40 text-center">
+          <p className="text-xs text-foreground/40 text-center tabular-nums">
             {results.length} resultado
             {results.length !== 1 ? "s" : ""} encontrado
             {results.length !== 1 ? "s" : ""}
+            {timeMs !== null && ` en ${timeMs} ms`}
           </p>
           {results.map((path, i) => (
             <div
