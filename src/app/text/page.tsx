@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { searchByText } from "@/lib/api";
 import { useSearch } from "@/lib/useSearch";
+import { parseName } from "@/lib/format";
 import { BackLink } from "@/components/BackLink";
 import { KSelector } from "@/components/KSelector";
 
@@ -100,7 +101,7 @@ export default function Text() {
                 <span className="w-5 text-right text-xs text-foreground/30 tabular-nums">
                   {i + 1}
                 </span>
-                <span className="truncate">{name}</span>
+                <span className="truncate capitalize">{parseName(name)}</span>
               </li>
             ))}
           </ul>
