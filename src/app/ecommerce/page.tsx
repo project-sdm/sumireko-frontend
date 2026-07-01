@@ -14,6 +14,7 @@ export default function Ecommerce() {
   const [k, setK] = useState(5);
   const [kRaw, setKRaw] = useState("5");
   const [results, setResults] = useState<string[]>([]);
+  const [timeMs, setTimeMs] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [dragging, setDragging] = useState(false);
@@ -130,9 +131,11 @@ export default function Ecommerce() {
     setKRaw(String(committed));
     setLoading(true);
     setError(null);
+    setTimeMs(null);
     try {
       const data = await searchByImage(file, committed, searchMode);
       setResults(data.results);
+      setTimeMs(data.time_ms);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error al buscar");
     } finally {
@@ -358,15 +361,22 @@ export default function Ecommerce() {
       )}
 
       {!loading && results.length > 0 && (
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
-          {results.map((path, i) => (
-            <img
-              key={i}
-              src={`${API_URL}/media/images/${path}`}
-              alt={`Similar item ${i + 1}`}
-              className="aspect-square rounded-lg object-cover transition-transform hover:scale-[1.03]"
-            />
-          ))}
+        <div className="flex flex-col gap-4">
+          {timeMs !== null && (
+            <p className="text-center text-xs text-foreground/40 tabular-nums">
+              {results.length} resultados en {timeMs} ms
+            </p>
+          )}
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
+            {results.map((path, i) => (
+              <img
+                key={i}
+                src={`${API_URL}/media/images/${path}`}
+                alt={`Similar item ${i + 1}`}
+                className="aspect-square rounded-lg object-cover transition-transform hover:scale-[1.03]"
+              />
+            ))}
+          </div>
         </div>
       )}
     </main>
