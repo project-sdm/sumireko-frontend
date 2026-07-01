@@ -1,9 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { API_URL, searchByImage } from "@/lib/api";
 import { KSelector } from "@/components/KSelector";
+import { BackLink } from "@/components/BackLink";
 import { SEARCH_MODES, type SearchMode } from "@/lib/searchModes";
 
 type Mode = "upload" | "camera";
@@ -146,12 +146,7 @@ export default function Ecommerce() {
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-16 flex flex-col gap-10">
-      <Link
-        href="/"
-        className="text-sm text-foreground/50 hover:text-foreground transition-colors"
-      >
-        ← Volver al inicio
-      </Link>
+      <BackLink />
 
       <header className="text-center">
         <h1 className="text-3xl font-semibold tracking-tight">
