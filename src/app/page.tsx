@@ -75,11 +75,23 @@ const apps = [
 export default function Home() {
   return (
     <main className="mx-auto max-w-4xl px-4 py-24 flex flex-col items-center gap-16">
-      <div className="text-center flex flex-col gap-3">
-        <h1 className="text-5xl font-semibold tracking-tight">Sumireko</h1>
-        <p className="text-foreground/60">
+      <div className="text-center flex flex-col items-center gap-4">
+        <h1 className="text-5xl sm:text-6xl font-semibold tracking-tight">
+          Sumireko
+        </h1>
+        <p className="text-foreground/60 max-w-md">
           Sistema multimodal de recuperación y búsqueda
         </p>
+        <div className="mt-1 flex flex-wrap justify-center gap-2">
+          {["Texto", "Imágenes", "Audio"].map((m) => (
+            <span
+              key={m}
+              className="rounded-full border border-surface-border bg-surface px-3 py-1 text-xs font-medium text-muted shadow-soft"
+            >
+              {m}
+            </span>
+          ))}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 w-full">

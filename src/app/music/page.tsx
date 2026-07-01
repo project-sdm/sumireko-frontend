@@ -7,6 +7,7 @@ import { API_URL, searchByAudio } from "@/lib/api";
 import { useSearch } from "@/lib/useSearch";
 import { KSelector } from "@/components/KSelector";
 import { BackLink } from "@/components/BackLink";
+import { PageHeader } from "@/components/PageHeader";
 import { UploadDropzone } from "@/components/UploadDropzone";
 import { SearchModeSelector } from "@/components/SearchModeSelector";
 import { type SearchMode } from "@/lib/searchModes";
@@ -149,15 +150,25 @@ export default function Music() {
     <main className="mx-auto max-w-3xl px-4 py-16 flex flex-col gap-10">
       <BackLink />
 
-      <header className="text-center">
-        <h1 className="text-3xl font-semibold tracking-tight">
-          Búsqueda Musical
-        </h1>
-        <p className="mt-2 text-sm text-foreground/60">
-          Sube un audio o graba desde tu micrófono para encontrar canciones
-          similares
-        </p>
-      </header>
+      <PageHeader
+        title="Búsqueda Musical"
+        subtitle="Sube un audio o graba desde tu micrófono para encontrar canciones similares"
+        icon={
+          <svg
+            className="h-6 w-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={1.5}
+              d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z"
+            />
+          </svg>
+        }
+      />
 
       {/* Mode toggle — hide once a file is ready */}
       {!fileName && (
@@ -303,7 +314,7 @@ export default function Music() {
 
       {/* Controls */}
       {fileName && (
-        <div className="flex items-center justify-center gap-4 flex-wrap">
+        <div className="flex flex-wrap items-center justify-center gap-4 rounded-xl border border-surface-border bg-surface p-4 shadow-soft">
           <SearchModeSelector value={searchMode} onChange={setSearchMode} />
           <KSelector
             value={k}
@@ -321,12 +332,25 @@ export default function Music() {
         </div>
       )}
 
-      {error && <p className="text-center text-sm text-red-500">{error}</p>}
+      {error && (
+        <p className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-center text-sm text-red-500">
+          {error}
+        </p>
+      )}
 
       {loading && (
         <div className="flex flex-col gap-3">
           {Array.from({ length: k }).map((_, i) => (
-            <div key={i} className="h-20 animate-pulse rounded-xl bg-surface" />
+            <div
+              key={i}
+              className="flex flex-col gap-3 rounded-xl border border-surface-border bg-surface p-4 shadow-soft"
+            >
+              <div className="flex items-center gap-3">
+                <div className="h-4 w-5 animate-pulse rounded bg-surface-2" />
+                <div className="h-4 w-40 animate-pulse rounded bg-surface-2" />
+              </div>
+              <div className="h-9 w-full animate-pulse rounded bg-surface-2" />
+            </div>
           ))}
         </div>
       )}
