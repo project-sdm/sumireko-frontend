@@ -57,6 +57,38 @@ export default function Text() {
           {loading ? "Buscando..." : "Buscar"}
         </button>
       </div>
+
+      {error && <p className="text-center text-sm text-red-500">{error}</p>}
+
+      {loading && (
+        <div className="flex flex-col gap-2">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="h-11 animate-pulse rounded-lg bg-surface" />
+          ))}
+        </div>
+      )}
+
+      {!loading && timeMs !== null && (
+        <div className="flex flex-col gap-3">
+          <p className="text-center text-xs text-foreground/40 tabular-nums">
+            {results.length} resultado{results.length !== 1 ? "s" : ""} en{" "}
+            {timeMs} ms
+          </p>
+          <ul className="flex flex-col gap-2">
+            {results.map((name, i) => (
+              <li
+                key={i}
+                className="flex items-center gap-3 rounded-lg bg-surface border border-surface-border p-3 text-sm"
+              >
+                <span className="w-5 text-right text-xs text-foreground/30 tabular-nums">
+                  {i + 1}
+                </span>
+                <span className="truncate">{name}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </main>
   );
 }
