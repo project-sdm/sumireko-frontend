@@ -46,7 +46,16 @@ export function UploadDropzone({
       onDragLeave={() => setDragging(false)}
       onDrop={handleDrop}
       onClick={() => inputRef.current?.click()}
-      className={`cursor-pointer rounded-xl border-2 border-dashed p-10 text-center transition-colors ${
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          inputRef.current?.click();
+        }
+      }}
+      role="button"
+      tabIndex={0}
+      aria-label={title}
+      className={`cursor-pointer rounded-xl border-2 border-dashed p-10 text-center transition-colors focus:outline-none focus-visible:border-accent focus-visible:ring-2 focus-visible:ring-accent/40 ${
         dragging
           ? "border-accent bg-accent/5"
           : "border-surface-border hover:border-foreground/30"
