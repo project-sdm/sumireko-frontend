@@ -3,6 +3,17 @@ import { SearchResponse } from "./schemas";
 export const API_URL =
   process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
+/** Wraps fetch so a network failure becomes a readable message. */
+async function safeFetch(url: string, init?: RequestInit): Promise<Response> {
+  try {
+    return await fetch(url, init);
+  } catch {
+    throw new Error(
+      "No se pudo conectar con el servidor. Revisar conexión",
+    );
+  }
+}
+
 async function postFile(
   endpoint: string,
   file: File,
@@ -16,7 +27,10 @@ async function postFile(
   const formData = new FormData();
   formData.append("file", file);
 
-  const res = await fetch(url.toString(), { method: "POST", body: formData });
+  const res = await safeFetch(url.toString(), {
+    method: "POST",
+    body: formData,
+  });
 
   if (!res.ok) {
     const text = await res.text().catch(() => res.statusText);
@@ -36,7 +50,7 @@ export async function searchByText(
   url.searchParams.set("k", String(k));
   url.searchParams.set("language", language);
 
-  const res = await fetch(url.toString());
+  const res = await safeFetch(url.toString());
 
   if (!res.ok) {
     const text = await res.text().catch(() => res.statusText);
