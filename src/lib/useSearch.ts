@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type { SearchResponse } from "./schemas";
 
 /**
@@ -13,22 +13,30 @@ export function useSearch() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Bumped on every run/reset so a slow response from an earlier search
+  // can be ignored instead of overwriting a newer one.
+  const requestId = useRef(0);
+
   async function run(searchFn: () => Promise<SearchResponse>) {
+    const id = ++requestId.current;
     setLoading(true);
     setError(null);
     setTimeMs(null);
     try {
       const data = await searchFn();
+      if (id !== requestId.current) return;
       setResults(data.results);
       setTimeMs(data.time_ms);
     } catch (err) {
+      if (id !== requestId.current) return;
       setError(err instanceof Error ? err.message : "Error al buscar");
     } finally {
-      setLoading(false);
+      if (id === requestId.current) setLoading(false);
     }
   }
 
   function reset() {
+    requestId.current++;
     setResults([]);
     setTimeMs(null);
     setError(null);
