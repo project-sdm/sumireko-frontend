@@ -11,7 +11,7 @@ async function postFile(
 ): Promise<SearchResponse> {
   const url = new URL(endpoint, API_URL);
   url.searchParams.set("k", String(k));
-  if (searchMode) url.searchParams.set("search_mode", searchMode);
+  if (searchMode) url.searchParams.set("mode", searchMode);
 
   const formData = new FormData();
   formData.append("file", file);
