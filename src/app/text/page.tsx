@@ -4,12 +4,14 @@ import { useState } from "react";
 import { searchByText } from "@/lib/api";
 import { useSearch } from "@/lib/useSearch";
 import { parseName } from "@/lib/format";
+import { type Language } from "@/lib/languages";
 import { BackLink } from "@/components/BackLink";
 import { KSelector } from "@/components/KSelector";
+import { LanguageSelector } from "@/components/LanguageSelector";
 
 export default function Text() {
   const [query, setQuery] = useState("");
-  const [language, setLanguage] = useState("english");
+  const [language, setLanguage] = useState<Language>("english");
   const [k, setK] = useState(5);
   const [kRaw, setKRaw] = useState("5");
   const { results, timeMs, loading, error, run } = useSearch();
@@ -36,15 +38,7 @@ export default function Text() {
       </header>
 
       <div className="flex gap-2">
-        <select
-          value={language}
-          onChange={(e) => setLanguage(e.target.value)}
-          className="rounded-lg bg-surface border border-surface-border px-3 py-2 text-sm font-medium outline-none cursor-pointer"
-        >
-          <option value="english">Inglés</option>
-          <option value="spanish">Español</option>
-          <option value="multilingual">Multilingüe</option>
-        </select>
+        <LanguageSelector value={language} onChange={setLanguage} />
         <input
           type="text"
           value={query}
