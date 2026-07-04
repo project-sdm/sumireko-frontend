@@ -10,6 +10,7 @@ import { UploadDropzone } from "@/components/UploadDropzone";
 import { SearchModeSelector } from "@/components/SearchModeSelector";
 import { type SearchMode } from "@/lib/searchModes";
 import { CameraIcon } from "@/components/icons";
+import { clampK } from "@/lib/clampK";
 
 type Mode = "upload" | "camera";
 
@@ -111,7 +112,7 @@ export default function Ecommerce() {
 
   async function handleSearch() {
     if (!file) return;
-    const committed = Math.min(40, Math.max(1, parseInt(kRaw, 10) || k));
+    const committed = clampK(kRaw, k);
     setK(committed);
     setKRaw(String(committed));
     await run(() => searchByImage(file, committed, searchMode));

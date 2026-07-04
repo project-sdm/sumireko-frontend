@@ -11,6 +11,7 @@ import { SearchModeSelector } from "@/components/SearchModeSelector";
 import { type SearchMode } from "@/lib/searchModes";
 import { parseName } from "@/lib/format";
 import { MusicNoteIcon } from "@/components/icons";
+import { clampK } from "@/lib/clampK";
 
 type Mode = "upload" | "record";
 
@@ -132,7 +133,7 @@ export default function Music() {
 
   async function handleSearch() {
     if (!file) return;
-    const committed = Math.min(40, Math.max(1, parseInt(kRaw, 10) || k));
+    const committed = clampK(kRaw, k);
     setK(committed);
     setKRaw(String(committed));
     await run(() => searchByAudio(file, committed, searchMode));
