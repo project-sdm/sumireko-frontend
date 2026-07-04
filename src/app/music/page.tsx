@@ -1,7 +1,5 @@
 "use client";
 
-// update backend for webm support
-
 import { useEffect, useRef, useState } from "react";
 import { API_URL, searchByAudio } from "@/lib/api";
 import { useSearch } from "@/lib/useSearch";
