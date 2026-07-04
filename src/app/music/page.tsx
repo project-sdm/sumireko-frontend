@@ -315,14 +315,18 @@ export default function Music() {
         </div>
       )}
 
-      {!loading && results.length > 0 && (
+      {!loading && timeMs !== null && (
         <div className="flex flex-col gap-3">
           <p className="text-xs text-foreground/40 text-center tabular-nums">
             {results.length} resultado
             {results.length !== 1 ? "s" : ""} encontrado
-            {results.length !== 1 ? "s" : ""}
-            {timeMs !== null && ` en ${timeMs} ms`}
+            {results.length !== 1 ? "s" : ""} en {timeMs} ms
           </p>
+          {results.length === 0 && (
+            <p className="text-center text-sm text-foreground/50 py-6">
+              No se encontraron canciones similares.
+            </p>
+          )}
           {results.map((path, i) => (
             <div
               key={i}

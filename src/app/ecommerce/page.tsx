@@ -270,23 +270,28 @@ export default function Ecommerce() {
         </div>
       )}
 
-      {!loading && results.length > 0 && (
+      {!loading && timeMs !== null && (
         <div className="flex flex-col gap-4">
-          {timeMs !== null && (
-            <p className="text-center text-xs text-foreground/40 tabular-nums">
-              {results.length} resultados en {timeMs} ms
+          <p className="text-center text-xs text-foreground/40 tabular-nums">
+            {results.length} resultados en {timeMs} ms
+          </p>
+          {results.length === 0 && (
+            <p className="text-center text-sm text-foreground/50 py-6">
+              No se encontraron productos similares.
             </p>
           )}
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
-            {results.map((path, i) => (
-              <img
-                key={i}
-                src={`${API_URL}/media/images/${path}`}
-                alt={`Similar item ${i + 1}`}
-                className="aspect-square rounded-lg border border-surface-border object-cover shadow-soft transition-all hover:scale-[1.03] hover:shadow-lg"
-              />
-            ))}
-          </div>
+          {results.length > 0 && (
+            <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
+              {results.map((path, i) => (
+                <img
+                  key={i}
+                  src={`${API_URL}/media/images/${path}`}
+                  alt={`Similar item ${i + 1}`}
+                  className="aspect-square rounded-lg border border-surface-border object-cover shadow-soft transition-all hover:scale-[1.03] hover:shadow-lg"
+                />
+              ))}
+            </div>
+          )}
         </div>
       )}
     </main>
