@@ -1,10 +1,6 @@
 import { BackLink } from "@/components/BackLink";
 import { PageHeader } from "@/components/PageHeader";
 
-export const metadata = {
-  title: "Manual de usuario · Sumireko",
-};
-
 export default function Manual() {
   return (
     <main className="mx-auto max-w-3xl px-4 py-16 flex flex-col gap-10">
@@ -12,7 +8,7 @@ export default function Manual() {
 
       <PageHeader
         title="Manual de usuario"
-        subtitle="Cómo usar cada modalidad de búsqueda del sistema"
+        subtitle="Cómo usar cada página del sistema"
         icon={
           <svg
             className="h-6 w-6"
@@ -35,40 +31,7 @@ export default function Manual() {
           <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent/10 text-sm font-semibold text-accent">
             1
           </span>
-          <h2 className="text-lg font-medium">Búsqueda de texto</h2>
-        </div>
-        <p className="text-sm text-foreground/70 leading-relaxed">
-          Encuentra los documentos más relevantes para una consulta usando el
-          índice invertido TF-IDF.
-        </p>
-        <ol className="flex flex-col gap-2 text-sm text-foreground/70 list-decimal pl-5 marker:text-muted">
-          <li>
-            Escribe tu consulta en el campo de texto (por ejemplo,{" "}
-            <span className="font-medium text-foreground">machine learning</span>
-            ).
-          </li>
-          <li>
-            Elige el idioma del corpus (Inglés, Español o Multilingüe) para
-            tokenizar y eliminar stopwords correctamente.
-          </li>
-          <li>
-            Ajusta el número de resultados (<span className="font-mono">k</span>)
-            con el selector.
-          </li>
-          <li>
-            Presiona <span className="font-medium text-foreground">Buscar</span>{" "}
-            o Enter. Verás los documentos ordenados por relevancia junto con la
-            latencia de la consulta.
-          </li>
-        </ol>
-      </section>
-
-      <section className="flex flex-col gap-4 rounded-xl border border-surface-border bg-surface p-6 shadow-soft">
-        <div className="flex items-center gap-3">
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent/10 text-sm font-semibold text-accent">
-            2
-          </span>
-          <h2 className="text-lg font-medium">Búsqueda visual</h2>
+          <h2 className="text-lg font-medium">Búsqueda E-Commerce</h2>
         </div>
         <p className="text-sm text-foreground/70 leading-relaxed">
           Sube una foto de una prenda y encuentra los productos más parecidos
@@ -86,8 +49,8 @@ export default function Manual() {
             comparar contra pgvector.
           </li>
           <li>
-            Ajusta el número de resultados (<span className="font-mono">k</span>)
-            y presiona{" "}
+            Ajusta el número de resultados (<span className="font-mono">k</span>
+            ) y presiona{" "}
             <span className="font-medium text-foreground">Buscar</span>.
           </li>
           <li>
@@ -100,30 +63,41 @@ export default function Manual() {
       <section className="flex flex-col gap-4 rounded-xl border border-surface-border bg-surface p-6 shadow-soft">
         <div className="flex items-center gap-3">
           <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent/10 text-sm font-semibold text-accent">
-            3
+            2
           </span>
           <h2 className="text-lg font-medium">Búsqueda musical</h2>
         </div>
         <p className="text-sm text-foreground/70 leading-relaxed">
-          Sube un archivo de audio y encuentra las canciones más parecidas por
-          sus características acústicas (MFCC) y un diccionario de palabras
-          acústicas.
+          Busca canciones por su letra (búsqueda textual TF-IDF) o por
+          características acústicas MFCC (subiendo un archivo de audio o
+          grabando desde el micrófono).
         </p>
         <ol className="flex flex-col gap-2 text-sm text-foreground/70 list-decimal pl-5 marker:text-muted">
           <li>
-            Arrastra un audio a la zona de subida, haz clic para elegir un
-            archivo, o graba directamente desde tu micrófono.
+            Elige el modo de entrada:{" "}
+            <span className="font-medium text-foreground">Por letra</span>{" "}
+            (escribe parte de la letra de una canción) o{" "}
+            <span className="font-medium text-foreground">Por audio</span>{" "}
+            (sube un archivo o graba desde el micrófono).
           </li>
           <li>
-            Elige el modo de búsqueda (
+            <span className="font-medium text-foreground">Modo texto:</span>{" "}
+            escribe la consulta y presiona{" "}
+            <span className="font-medium text-foreground">Buscar</span> o Enter.
+            Ajusta el número de resultados (<span className="font-mono">k</span>
+            ) con el selector.
+          </li>
+          <li>
+            <span className="font-medium text-foreground">Modo audio:</span>{" "}
+            arrastra un archivo de audio, haz clic para elegirlo, o graba
+            directamente desde tu micrófono. Elige el modo de búsqueda (
             <span className="font-medium text-foreground">Nativo</span> o
-            Postgres) y el número de resultados (
-            <span className="font-mono">k</span>).
+            Postgres) y ajusta <span className="font-mono">k</span>.
           </li>
           <li>
-            Presiona <span className="font-medium text-foreground">Buscar</span>.
-            Cada resultado incluye un reproductor para escuchar la canción y la
-            latencia de la consulta.
+            Presiona <span className="font-medium text-foreground">Buscar</span>
+            . Cada resultado incluye nombre de la canción, artista, género,
+            álbum, popularidad y un reproductor para escucharla.
           </li>
         </ol>
       </section>

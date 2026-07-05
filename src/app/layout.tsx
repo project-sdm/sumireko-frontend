@@ -12,8 +12,6 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Sumireko",
-  description:
-    "Sistema multimodal de recuperación por similitud: texto, imágenes y audio.",
 };
 
 export default function RootLayout({
@@ -45,12 +43,6 @@ export default function RootLayout({
             </Link>
             <div className="flex items-center gap-6">
               <div className="flex gap-6 text-sm text-foreground/60">
-                <Link
-                  href="/text"
-                  className="hover:text-foreground transition-colors"
-                >
-                  Texto
-                </Link>
                 <Link
                   href="/ecommerce"
                   className="hover:text-foreground transition-colors"

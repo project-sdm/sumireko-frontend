@@ -1,5 +1,10 @@
 import { useRef, useState } from "react";
-import type { SearchResponse } from "./schemas";
+
+interface SearchResult {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  results: any[];
+  time_ms: number;
+}
 
 /**
  * Shared search state used by every modality page (text, image, audio).
@@ -7,8 +12,8 @@ import type { SearchResponse } from "./schemas";
  * keeps its own arguments (query/file, k, mode, language) while the
  * loading/error/timing bookkeeping lives here.
  */
-export function useSearch() {
-  const [results, setResults] = useState<string[]>([]);
+export function useSearch<T extends SearchResult>() {
+  const [results, setResults] = useState<T["results"]>([]);
   const [timeMs, setTimeMs] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -17,7 +22,7 @@ export function useSearch() {
   // can be ignored instead of overwriting a newer one.
   const requestId = useRef(0);
 
-  async function run(searchFn: () => Promise<SearchResponse>) {
+  async function run(searchFn: () => Promise<T>) {
     const id = ++requestId.current;
     setLoading(true);
     setError(null);

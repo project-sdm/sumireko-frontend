@@ -1,25 +1,22 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { API_URL, searchByAudio } from "@/lib/api";
+import { API_URL, searchByAudio, searchByText } from "@/lib/api";
 import { useSearch } from "@/lib/useSearch";
+import { type AudioSearchResponse } from "@/lib/schemas";
 import { KSelector } from "@/components/KSelector";
 import { BackLink } from "@/components/BackLink";
 import { PageHeader } from "@/components/PageHeader";
 import { UploadDropzone } from "@/components/UploadDropzone";
 import { SearchModeSelector } from "@/components/SearchModeSelector";
 import { type SearchMode } from "@/lib/searchModes";
-import { parseName } from "@/lib/format";
 import { MusicNoteIcon } from "@/components/icons";
 import { clampK } from "@/lib/clampK";
 
-type Mode = "upload" | "record";
+type SubMode = "upload" | "record";
+type InputMode = "text" | "audio";
 
-const RECORDING_MIME_CANDIDATES = [
-  "audio/webm",
-  "audio/mp4",
-  "audio/ogg",
-];
+const RECORDING_MIME_CANDIDATES = ["audio/webm", "audio/mp4", "audio/ogg"];
 
 function pickSupportedMimeType(): string | undefined {
   if (typeof MediaRecorder === "undefined" || !MediaRecorder.isTypeSupported) {
@@ -38,7 +35,9 @@ function formatTime(s: number): string {
 }
 
 export default function Music() {
-  const [mode, setMode] = useState<Mode>("upload");
+  const [inputMode, setInputMode] = useState<InputMode>("audio");
+  const [query, setQuery] = useState("");
+  const [subMode, setSubMode] = useState<SubMode>("upload");
   const [file, setFile] = useState<File | null>(null);
   const [fileName, setFileName] = useState<string | null>(null);
   const [k, setK] = useState(5);
@@ -51,7 +50,7 @@ export default function Music() {
     run,
     reset: resetSearch,
     setError,
-  } = useSearch();
+  } = useSearch<AudioSearchResponse>();
   const [recording, setRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const [searchMode, setSearchMode] = useState<SearchMode>("native");
@@ -60,6 +59,7 @@ export default function Music() {
   const chunksRef = useRef<BlobPart[]>([]);
   const streamRef = useRef<MediaStream | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     return () => {
@@ -68,16 +68,27 @@ export default function Music() {
     };
   }, []);
 
+  function switchInputMode(m: InputMode) {
+    if (m === inputMode) return;
+    if (recording) stopRecording();
+    setInputMode(m);
+    setFile(null);
+    setFileName(null);
+    setQuery("");
+    resetSearch();
+    setRecordingTime(0);
+  }
+
   function handleFile(f: File) {
     setFile(f);
     setFileName(f.name);
     resetSearch();
   }
 
-  function switchMode(m: Mode) {
-    if (m === mode) return;
+  function switchSubMode(m: SubMode) {
+    if (m === subMode) return;
     if (recording) stopRecording();
-    setMode(m);
+    setSubMode(m);
     setFile(null);
     setFileName(null);
     resetSearch();
@@ -131,7 +142,15 @@ export default function Music() {
     setRecording(false);
   }
 
-  async function handleSearch() {
+  async function handleTextSearch() {
+    if (!query.trim()) return;
+    const committed = clampK(kRaw, k);
+    setK(committed);
+    setKRaw(String(committed));
+    await run(() => searchByText(query.trim(), committed));
+  }
+
+  async function handleAudioSearch() {
     if (!file) return;
     const committed = clampK(kRaw, k);
     setK(committed);
@@ -139,11 +158,17 @@ export default function Music() {
     await run(() => searchByAudio(file, committed, searchMode));
   }
 
-  function reset() {
+  function resetAudio() {
     setFile(null);
     setFileName(null);
     resetSearch();
     setRecordingTime(0);
+  }
+
+  function activeTabStyle(active: boolean) {
+    return active
+      ? "bg-foreground text-background"
+      : "text-foreground/60 hover:text-foreground";
   }
 
   return (
@@ -152,23 +177,67 @@ export default function Music() {
 
       <PageHeader
         title="Búsqueda Musical"
-        subtitle="Sube un audio o graba desde tu micrófono para encontrar canciones similares"
+        subtitle="Busca canciones por su letra o por características acústicas MFCC"
         icon={<MusicNoteIcon className="h-6 w-6" />}
       />
 
-      {/* Mode toggle — hide once a file is ready */}
-      {!fileName && (
+      {/* Input mode toggle */}
+      <div className="flex justify-center">
+        <div className="flex rounded-lg bg-surface border border-surface-border p-1 gap-1">
+          {(["text", "audio"] as InputMode[]).map((m) => (
+            <button
+              key={m}
+              onClick={() => switchInputMode(m)}
+              className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${activeTabStyle(inputMode === m)}`}
+            >
+              {m === "text" ? "Por letra" : "Por audio"}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Text search input */}
+      {inputMode === "text" && (
+        <div className="flex flex-col gap-4 rounded-xl border border-surface-border bg-surface p-4 shadow-soft">
+          <div className="flex gap-2">
+            <input
+              ref={inputRef}
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleTextSearch()}
+              placeholder="Letra de la canción..."
+              className="flex-1 rounded-lg bg-surface-2 border border-surface-border px-4 py-2 text-sm outline-none focus:border-accent/50 transition-colors"
+            />
+            <button
+              onClick={handleTextSearch}
+              disabled={!query.trim() || loading}
+              className="rounded-lg bg-foreground text-background px-5 py-2 text-sm font-medium transition-opacity hover:opacity-80 disabled:opacity-40 cursor-pointer"
+            >
+              {loading ? "Buscando..." : "Buscar"}
+            </button>
+          </div>
+
+          <div className="flex justify-center">
+            <KSelector
+              value={k}
+              rawValue={kRaw}
+              onValueChange={setK}
+              onRawChange={setKRaw}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Audio: sub-mode toggle — hide once a file is ready */}
+      {inputMode === "audio" && !fileName && (
         <div className="flex justify-center">
           <div className="flex rounded-lg bg-surface border border-surface-border p-1 gap-1">
-            {(["upload", "record"] as Mode[]).map((m) => (
+            {(["upload", "record"] as SubMode[]).map((m) => (
               <button
                 key={m}
-                onClick={() => switchMode(m)}
-                className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
-                  mode === m
-                    ? "bg-foreground text-background"
-                    : "text-foreground/60 hover:text-foreground"
-                }`}
+                onClick={() => switchSubMode(m)}
+                className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${activeTabStyle(subMode === m)}`}
               >
                 {m === "upload" ? "Subir archivo" : "Grabar"}
               </button>
@@ -177,8 +246,8 @@ export default function Music() {
         </div>
       )}
 
-      {/* Upload zone */}
-      {mode === "upload" && !fileName && (
+      {/* Audio: upload zone */}
+      {inputMode === "audio" && subMode === "upload" && !fileName && (
         <UploadDropzone
           accept="audio/*"
           title="Arrastra un audio aquí o haz click"
@@ -190,8 +259,8 @@ export default function Music() {
         />
       )}
 
-      {/* Recording zone */}
-      {mode === "record" && !fileName && (
+      {/* Audio: recording zone */}
+      {inputMode === "audio" && subMode === "record" && !fileName && (
         <div className="flex flex-col items-center gap-6 rounded-xl border-2 border-dashed border-surface-border p-12">
           {recording ? (
             <>
@@ -251,8 +320,8 @@ export default function Music() {
         </div>
       )}
 
-      {/* File ready chip */}
-      {fileName && (
+      {/* Audio: file ready chip */}
+      {inputMode === "audio" && fileName && (
         <div className="flex items-center gap-3 rounded-xl border border-surface-border bg-surface p-4">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent/10 text-accent">
             <MusicNoteIcon className="h-5 w-5" />
@@ -260,11 +329,11 @@ export default function Music() {
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium truncate">{fileName}</p>
             <p className="text-xs text-foreground/40">
-              {mode === "record" ? "Grabación" : "Archivo subido"}
+              {subMode === "record" ? "Grabación" : "Archivo subido"}
             </p>
           </div>
           <button
-            onClick={reset}
+            onClick={resetAudio}
             className="text-xs text-foreground/40 hover:text-foreground/70 transition-colors shrink-0"
           >
             Cambiar
@@ -272,8 +341,8 @@ export default function Music() {
         </div>
       )}
 
-      {/* Controls */}
-      {fileName && (
+      {/* Audio: controls */}
+      {inputMode === "audio" && fileName && (
         <div className="flex flex-wrap items-center justify-center gap-4 rounded-xl border border-surface-border bg-surface p-4 shadow-soft">
           <SearchModeSelector value={searchMode} onChange={setSearchMode} />
           <KSelector
@@ -283,7 +352,7 @@ export default function Music() {
             onRawChange={setKRaw}
           />
           <button
-            onClick={handleSearch}
+            onClick={handleAudioSearch}
             disabled={loading}
             className="rounded-lg bg-foreground text-background px-5 py-2 text-sm font-medium transition-opacity hover:opacity-80 disabled:opacity-40 cursor-pointer"
           >
@@ -327,7 +396,7 @@ export default function Music() {
               No se encontraron canciones similares.
             </p>
           )}
-          {results.map((path, i) => (
+          {results.map((song, i) => (
             <div
               key={i}
               className="flex flex-col gap-3 rounded-xl bg-surface border border-surface-border p-4 shadow-soft transition-colors hover:border-accent/40"
@@ -336,13 +405,29 @@ export default function Music() {
                 <span className="text-xs text-foreground/30 tabular-nums w-5 text-right">
                   {i + 1}
                 </span>
-                <p className="text-sm font-medium capitalize">
-                  {parseName(path)}
-                </p>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium truncate">
+                    {song.track_name}
+                  </p>
+                  <p className="text-xs text-foreground/50 truncate">
+                    {song.track_artist}
+                  </p>
+                </div>
+                <span className="text-xs text-foreground/30 tabular-nums shrink-0">
+                  {song.track_popularity}%
+                </span>
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                <span className="text-[10px] rounded-full bg-foreground/5 px-2 py-0.5 text-foreground/40">
+                  {song.playlist_genre}
+                </span>
+                <span className="text-[10px] rounded-full bg-foreground/5 px-2 py-0.5 text-foreground/40">
+                  {song.track_album_name}
+                </span>
               </div>
               <audio
                 controls
-                src={`${API_URL}/media/audios/${path}`}
+                src={`${API_URL}/media/audios/${song.track_id}.mp3`}
                 className="w-full h-9"
               />
             </div>

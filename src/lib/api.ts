@@ -1,4 +1,7 @@
-import { SearchResponse } from "./schemas";
+import {
+  ImageSearchResponse,
+  AudioSearchResponse,
+} from "./schemas";
 
 export const API_URL =
   process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
@@ -8,18 +11,17 @@ async function safeFetch(url: string, init?: RequestInit): Promise<Response> {
   try {
     return await fetch(url, init);
   } catch {
-    throw new Error(
-      "No se pudo conectar con el servidor. Revisar conexión",
-    );
+    throw new Error("No se pudo conectar con el servidor. Revisar conexión");
   }
 }
 
-async function postFile(
+async function postFile<T>(
   endpoint: string,
   file: File,
   k: number,
-  searchMode?: string,
-): Promise<SearchResponse> {
+  searchMode: string | undefined,
+  schema: { parse: (data: unknown) => T },
+): Promise<T> {
   const url = new URL(endpoint, API_URL);
   url.searchParams.set("k", String(k));
   if (searchMode) url.searchParams.set("mode", searchMode);
@@ -37,18 +39,13 @@ async function postFile(
     throw new Error(`${res.status}: ${text}`);
   }
 
-  return SearchResponse.parse(await res.json());
+  return schema.parse(await res.json());
 }
 
-export async function searchByText(
-  q: string,
-  k = 5,
-  language = "english",
-): Promise<SearchResponse> {
+export async function searchByText(q: string, k = 5): Promise<AudioSearchResponse> {
   const url = new URL("/text/search", API_URL);
   url.searchParams.set("q", q);
   url.searchParams.set("k", String(k));
-  url.searchParams.set("language", language);
 
   const res = await safeFetch(url.toString());
 
@@ -57,13 +54,13 @@ export async function searchByText(
     throw new Error(`${res.status}: ${text}`);
   }
 
-  return SearchResponse.parse(await res.json());
+  return AudioSearchResponse.parse(await res.json());
 }
 
 export function searchByImage(file: File, k = 5, searchMode?: string) {
-  return postFile("/images/search", file, k, searchMode);
+  return postFile("/images/search", file, k, searchMode, ImageSearchResponse);
 }
 
 export function searchByAudio(file: File, k = 5, searchMode?: string) {
-  return postFile("/audio/search", file, k, searchMode);
+  return postFile("/audio/search", file, k, searchMode, AudioSearchResponse);
 }

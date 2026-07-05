@@ -4,7 +4,7 @@ import { CameraIcon, MusicNoteIcon } from "@/components/icons";
 const apps = [
   {
     href: "/ecommerce",
-    title: "Búsqueda Visual",
+    title: "Búsqueda E-Commerce",
     description:
       "Sube una imagen de prenda y encuentra los productos más similares del catálogo.",
     icon: <CameraIcon className="h-8 w-8" />,
@@ -13,29 +13,8 @@ const apps = [
     href: "/music",
     title: "Búsqueda Musical",
     description:
-      "Sube un archivo de audio y encuentra las canciones más similares por características acústicas MFCC.",
+      "Busca canciones por su letra o por características acústicas MFCC.",
     icon: <MusicNoteIcon className="h-8 w-8" />,
-  },
-  {
-    href: "/text",
-    title: "Búsqueda de Texto",
-    description:
-      "Escribe una consulta y encuentra los documentos más relevantes usando el índice invertido TF-IDF.",
-    icon: (
-      <svg
-        className="h-8 w-8"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={1.5}
-          d="M21 21l-5.2-5.2m0 0A7.5 7.5 0 105.2 5.2a7.5 7.5 0 0010.6 10.6z"
-        />
-      </svg>
-    ),
   },
 ];
 
@@ -47,21 +26,11 @@ export default function Home() {
           Sumireko
         </h1>
         <p className="text-foreground/60 max-w-md">
-          Sistema multimodal de recuperación y búsqueda
+          Sistema multimodal de recuperación y búsqueda.
         </p>
-        <div className="mt-1 flex flex-wrap justify-center gap-2">
-          {["Texto", "Imágenes", "Audio"].map((m) => (
-            <span
-              key={m}
-              className="rounded-full border border-surface-border bg-surface px-3 py-1 text-xs font-medium text-muted shadow-soft"
-            >
-              {m}
-            </span>
-          ))}
-        </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 w-full">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 w-full">
         {apps.map((app) => (
           <Link
             key={app.href}
@@ -89,7 +58,7 @@ export default function Home() {
 
       <Link
         href="/manual"
-        className="text-sm text-foreground/50 hover:text-accent transition-colors"
+        className="text-lg text-foreground/50 hover:text-accent transition-colors"
       >
         ¿Primera vez? Lee el manual de usuario →
       </Link>

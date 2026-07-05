@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { API_URL, searchByImage } from "@/lib/api";
 import { useSearch } from "@/lib/useSearch";
+import { type ImageSearchResponse } from "@/lib/schemas";
 import { KSelector } from "@/components/KSelector";
 import { BackLink } from "@/components/BackLink";
 import { PageHeader } from "@/components/PageHeader";
@@ -20,7 +21,8 @@ export default function Ecommerce() {
   const [file, setFile] = useState<File | null>(null);
   const [k, setK] = useState(5);
   const [kRaw, setKRaw] = useState("5");
-  const { results, timeMs, loading, error, run, reset, setError } = useSearch();
+  const { results, timeMs, loading, error, run, reset, setError } =
+    useSearch<ImageSearchResponse>();
   const [cameraActive, setCameraActive] = useState(false);
   const [searchMode, setSearchMode] = useState<SearchMode>("native");
 
@@ -50,7 +52,7 @@ export default function Ecommerce() {
     previewUrlRef.current = url;
     setFile(f);
     setPreview(url);
-    reset();
+    setError(null);
   }
 
   async function startCamera() {
@@ -106,7 +108,6 @@ export default function Ecommerce() {
   function resetToInput() {
     clearPreview();
     setFile(null);
-    reset();
     if (mode === "camera") startCamera();
   }
 
@@ -123,7 +124,7 @@ export default function Ecommerce() {
       <BackLink />
 
       <PageHeader
-        title="Búsqueda Visual"
+        title="Búsqueda E-Commerce"
         subtitle="Sube una imagen o toma una foto para encontrar prendas similares"
         icon={<CameraIcon className="h-6 w-6" />}
       />
@@ -281,14 +282,46 @@ export default function Ecommerce() {
             </p>
           )}
           {results.length > 0 && (
-            <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
-              {results.map((path, i) => (
-                <img
+            <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
+              {results.map((product, i) => (
+                <div
                   key={i}
-                  src={`${API_URL}/media/images/${path}`}
-                  alt={`Similar item ${i + 1}`}
-                  className="aspect-square rounded-lg border border-surface-border object-cover shadow-soft transition-all hover:scale-[1.03] hover:shadow-lg"
-                />
+                  className="flex flex-col rounded-xl border border-surface-border bg-surface shadow-soft overflow-hidden transition-all hover:shadow-lg"
+                >
+                  <img
+                    src={`${API_URL}/media/images/${product.filename}`}
+                    alt={product.name}
+                    className="aspect-square w-full object-cover"
+                  />
+                  <div className="flex flex-col gap-1 p-3">
+                    <p className="text-sm font-medium truncate">
+                      {product.name}
+                    </p>
+                    <p className="text-xs text-foreground/50 truncate">
+                      {product.variant_name}
+                    </p>
+                    {product.brand_name && (
+                      <p className="text-xs text-foreground/40">
+                        {product.brand_name}
+                      </p>
+                    )}
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-sm font-semibold">
+                        ${product.price}
+                      </span>
+                      {product.season && (
+                        <span className="text-[10px] rounded-full bg-foreground/5 px-2 py-0.5 text-foreground/40">
+                          {product.season}
+                        </span>
+                      )}
+                    </div>
+                    {product.categories && (
+                      <p className="text-[10px] text-foreground/30 truncate">
+                        {product.categories}
+                      </p>
+                    )}
+                  </div>
+                </div>
               ))}
             </div>
           )}
