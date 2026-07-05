@@ -12,21 +12,7 @@ import { SearchModeSelector } from "@/components/SearchModeSelector";
 import { type SearchMode } from "@/lib/searchModes";
 import { CameraIcon } from "@/components/icons";
 import { clampK } from "@/lib/clampK";
-
-const TOP_STYLES = [
-  {
-    card: "border-amber-400/30 bg-amber-50/50 dark:bg-amber-950/20",
-    badge: "bg-amber-500 text-white ring-2 ring-amber-300",
-  },
-  {
-    card: "border-slate-400/30 bg-slate-50/50 dark:bg-slate-950/20",
-    badge: "bg-slate-500 text-white ring-2 ring-slate-300",
-  },
-  {
-    card: "border-orange-400/30 bg-orange-50/50 dark:bg-orange-950/20",
-    badge: "bg-orange-600 text-white ring-2 ring-orange-300",
-  },
-] as const;
+import { TOP_STYLES } from "@/lib/topStyles";
 
 type Mode = "upload" | "camera";
 
@@ -162,7 +148,7 @@ export default function Ecommerce() {
   }
 
   return (
-    <main className="mx-auto max-w-3xl px-4 py-16 flex flex-col gap-10">
+    <main className="mx-auto max-w-3xl px-4 py-8 flex flex-col gap-6">
       <BackLink />
 
       <PageHeader
@@ -310,7 +296,7 @@ export default function Ecommerce() {
 
       {!loading && timeMs !== null && (
         <div className="flex flex-col gap-4">
-          <p className="text-center text-md text-foreground/50 tabular-nums">
+          <p className="text-center text-sm text-foreground/50 tabular-nums">
             {results.length} resultados en {timeMs} ms
           </p>
           {results.length === 0 && (
@@ -346,11 +332,9 @@ export default function Ecommerce() {
                     </span>
                   </div>
                   <div className="flex flex-col gap-1 p-3">
-                    <p className="text-sm font-medium truncate">
-                      {product.name}
-                    </p>
+                    <p className="text-lg font-medium">{product.name}</p>
                     {product.variant_name && (
-                      <p className="text-xs text-foreground/50 truncate">
+                      <p className="text-sm text-foreground/50 truncate">
                         {product.variant_name}
                       </p>
                     )}
@@ -360,7 +344,7 @@ export default function Ecommerce() {
                       </p>
                     )}
                     <div className="flex items-center gap-2 mt-1">
-                      <span className="text-sm font-semibold">
+                      <span className="text-xl font-semibold">
                         ${product.price}
                       </span>
                       {product.season && (

@@ -62,8 +62,7 @@ export default function RootLayout({
         </header>
         <div className="flex-1">{children}</div>
         <footer className="border-t border-surface-border">
-          <div className="mx-auto max-w-5xl px-4 py-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-muted">
-            <span>Sumireko · Base de Datos 2 · UTEC 2026-1</span>
+          <div className="mx-auto max-w-5xl px-4 py-6 flex flex-col sm:flex-row items-center justify-center gap-2 text-xs text-muted">
             <a
               href="https://github.com/project-sdm/sumireko-frontend"
               target="_blank"

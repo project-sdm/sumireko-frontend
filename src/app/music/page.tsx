@@ -13,6 +13,7 @@ import { type SearchMode } from "@/lib/searchModes";
 import { type TextSearchMode, TEXT_SEARCH_MODES } from "@/lib/searchModes";
 import { MusicNoteIcon } from "@/components/icons";
 import { clampK } from "@/lib/clampK";
+import { TOP_STYLES } from "@/lib/topStyles";
 
 type SubMode = "upload" | "record";
 type InputMode = "text" | "audio";
@@ -250,7 +251,7 @@ export default function Music() {
   }
 
   return (
-    <main className="mx-auto max-w-3xl px-4 py-16 flex flex-col gap-10">
+    <main className="mx-auto max-w-3xl px-4 py-8 flex flex-col gap-6">
       <BackLink />
 
       <PageHeader
@@ -479,7 +480,7 @@ export default function Music() {
 
       {!loading && timeMs !== null && (
         <div className="flex flex-col gap-3">
-          <p className="text-xs text-foreground/40 text-center tabular-nums">
+          <p className="text-sm text-foreground/40 text-center tabular-nums">
             {results.length} resultado
             {results.length !== 1 ? "s" : ""} encontrado
             {results.length !== 1 ? "s" : ""} en {timeMs} ms
@@ -492,10 +493,18 @@ export default function Music() {
           {results.map((song, i) => (
             <div
               key={i}
-              className="flex flex-col gap-3 rounded-xl bg-surface border border-surface-border p-4 shadow-soft transition-colors"
+              className={`flex flex-col gap-3 rounded-xl border p-4 shadow-soft transition-colors ${
+                i < 3 ? TOP_STYLES[i].card : "bg-surface border-surface-border"
+              }`}
             >
               <div className="flex items-center gap-3">
-                <span className="text-xs text-foreground/30 tabular-nums w-5 text-right">
+                <span
+                  className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold tabular-nums shadow-xs shrink-0 ${
+                    i < 3
+                      ? TOP_STYLES[i].badge
+                      : "bg-foreground/10 text-foreground/50"
+                  }`}
+                >
                   {i + 1}
                 </span>
                 <div className="flex-1 min-w-0">

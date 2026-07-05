@@ -24,7 +24,7 @@ export default function Home() {
         <h1 className="text-5xl sm:text-6xl font-semibold tracking-tight">
           Sumireko
         </h1>
-        <p className="text-foreground/60 max-w-md">
+        <p className="text-foreground/60 max-w-md text-lg">
           Sistema multimodal de recuperación y búsqueda.
         </p>
       </div>
@@ -48,7 +48,7 @@ export default function Home() {
             <span className="mt-auto inline-flex items-center gap-1 text-xs text-foreground/40 group-hover:text-accent transition-colors">
               Explorar
               <span className="transition-transform group-hover:translate-x-0.5">
-                →
+                -&gt;
               </span>
             </span>
           </Link>
@@ -59,7 +59,7 @@ export default function Home() {
         href="/manual"
         className="text-lg text-foreground/50 hover:text-accent transition-colors"
       >
-        ¿Primera vez? Lee el manual de usuario →
+        ¿Primera vez? Lee el manual de usuario -&gt;
       </Link>
     </main>
   );

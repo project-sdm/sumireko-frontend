@@ -3,7 +3,7 @@ import { PageHeader } from "@/components/PageHeader";
 
 export default function Manual() {
   return (
-    <main className="mx-auto max-w-3xl px-4 py-16 flex flex-col gap-10">
+    <main className="mx-auto max-w-3xl px-4 py-8 flex flex-col gap-6">
       <BackLink />
 
       <PageHeader
