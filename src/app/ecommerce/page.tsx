@@ -345,7 +345,7 @@ export default function Ecommerce() {
                     )}
                     <div className="flex items-center gap-2 mt-1">
                       <span className="text-xl font-semibold">
-                        ${product.price}
+                        ₹{product.price}
                       </span>
                       {product.season && (
                         <span className="text-[10px] rounded-full bg-foreground/5 px-2 py-0.5 text-foreground/40">
