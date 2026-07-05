@@ -59,3 +59,7 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans);
 }
+
+button, select, summary, [role="button"], [role="option"], [role="tab"] {
+  cursor: pointer;
+}

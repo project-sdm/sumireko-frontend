@@ -10,6 +10,7 @@ import { PageHeader } from "@/components/PageHeader";
 import { UploadDropzone } from "@/components/UploadDropzone";
 import { SearchModeSelector } from "@/components/SearchModeSelector";
 import { type SearchMode } from "@/lib/searchModes";
+import { type TextSearchMode, TEXT_SEARCH_MODES } from "@/lib/searchModes";
 import { MusicNoteIcon } from "@/components/icons";
 import { clampK } from "@/lib/clampK";
 
@@ -83,8 +84,7 @@ async function blobToWav(blob: Blob): Promise<Blob> {
     w(36, "data");
     view.setUint32(40, dataSize, true);
 
-    for (let i = 0; i < length; i++)
-      view.setInt16(44 + i * 2, pcm[i], true);
+    for (let i = 0; i < length; i++) view.setInt16(44 + i * 2, pcm[i], true);
 
     audioCtx.close();
     return new Blob([buffer], { type: "audio/wav" });
@@ -113,6 +113,8 @@ export default function Music() {
   const [recording, setRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const [searchMode, setSearchMode] = useState<SearchMode>("native");
+  const [textSearchMode, setTextSearchMode] =
+    useState<TextSearchMode>("native");
   const [lyricsOpenIndex, setLyricsOpenIndex] = useState<number | null>(null);
 
   const recorderRef = useRef<MediaRecorder | null>(null);
@@ -184,11 +186,9 @@ export default function Music() {
         const wavBlob = await blobToWav(blob);
         const isWav = wavBlob !== blob;
         handleFile(
-          new File(
-            [wavBlob],
-            isWav ? "recording.wav" : `recording.${ext}`,
-            { type: isWav ? "audio/wav" : type },
-          ),
+          new File([wavBlob], isWav ? "recording.wav" : `recording.${ext}`, {
+            type: isWav ? "audio/wav" : type,
+          }),
         );
         streamRef.current?.getTracks().forEach((t) => t.stop());
         streamRef.current = null;
@@ -221,7 +221,7 @@ export default function Music() {
     setK(committed);
     setKRaw(String(committed));
     setLyricsOpenIndex(null);
-    await run(() => searchByText(query.trim(), committed));
+    await run(() => searchByText(query.trim(), committed, textSearchMode));
   }
 
   async function handleAudioSearch() {
@@ -255,11 +255,10 @@ export default function Music() {
 
       <PageHeader
         title="Búsqueda Musical"
-        subtitle="Busca canciones por su letra o por características acústicas MFCC"
+        subtitle="Busca canciones por su letra o por audio."
         icon={<MusicNoteIcon className="h-6 w-6" />}
       />
 
-      {/* Input mode toggle */}
       <div className="flex justify-center">
         <div className="flex rounded-lg bg-surface border border-surface-border p-1 gap-1">
           {(["text", "audio"] as InputMode[]).map((m) => (
@@ -274,7 +273,6 @@ export default function Music() {
         </div>
       </div>
 
-      {/* Text search input */}
       {inputMode === "text" && (
         <div className="flex flex-col gap-4 rounded-xl border border-surface-border bg-surface p-4 shadow-soft">
           <div className="flex gap-2">
@@ -296,7 +294,23 @@ export default function Music() {
             </button>
           </div>
 
-          <div className="flex justify-center">
+          <div className="flex flex-wrap items-center justify-center gap-4">
+            <div className="flex items-center gap-2 rounded-lg bg-surface-2 border border-surface-border px-3 py-2">
+              <label className="text-sm text-foreground/60">Modo</label>
+              <select
+                value={textSearchMode}
+                onChange={(e) =>
+                  setTextSearchMode(e.target.value as TextSearchMode)
+                }
+                className="bg-transparent text-sm font-medium outline-none cursor-pointer h-7"
+              >
+                {TEXT_SEARCH_MODES.map((m) => (
+                  <option key={m.value} value={m.value}>
+                    {m.label}
+                  </option>
+                ))}
+              </select>
+            </div>
             <KSelector
               value={k}
               rawValue={kRaw}
@@ -307,7 +321,6 @@ export default function Music() {
         </div>
       )}
 
-      {/* Audio: sub-mode toggle — hide once a file is ready */}
       {inputMode === "audio" && !fileName && (
         <div className="flex justify-center">
           <div className="flex rounded-lg bg-surface border border-surface-border p-1 gap-1">
@@ -324,7 +337,6 @@ export default function Music() {
         </div>
       )}
 
-      {/* Audio: upload zone */}
       {inputMode === "audio" && subMode === "upload" && !fileName && (
         <UploadDropzone
           accept="audio/*"
@@ -337,7 +349,6 @@ export default function Music() {
         />
       )}
 
-      {/* Audio: recording zone */}
       {inputMode === "audio" && subMode === "record" && !fileName && (
         <div className="flex flex-col items-center gap-6 rounded-xl border-2 border-dashed border-surface-border p-12">
           {recording ? (
@@ -398,7 +409,6 @@ export default function Music() {
         </div>
       )}
 
-      {/* Audio: file ready chip */}
       {inputMode === "audio" && fileName && (
         <div className="flex items-center gap-3 rounded-xl border border-surface-border bg-surface p-4">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent/10 text-accent">
@@ -419,14 +429,12 @@ export default function Music() {
         </div>
       )}
 
-      {/* Audio: preview player */}
       {inputMode === "audio" && fileName && audioUrlRef.current && (
         <audio controls src={audioUrlRef.current} className="w-full h-10">
           Tu navegador no soporta audio
         </audio>
       )}
 
-      {/* Audio: controls */}
       {inputMode === "audio" && fileName && (
         <div className="flex flex-wrap items-center justify-center gap-4 rounded-xl border border-surface-border bg-surface p-4 shadow-soft">
           <SearchModeSelector value={searchMode} onChange={setSearchMode} />
@@ -484,7 +492,7 @@ export default function Music() {
           {results.map((song, i) => (
             <div
               key={i}
-              className="flex flex-col gap-3 rounded-xl bg-surface border border-surface-border p-4 shadow-soft transition-colors hover:border-accent/40"
+              className="flex flex-col gap-3 rounded-xl bg-surface border border-surface-border p-4 shadow-soft transition-colors"
             >
               <div className="flex items-center gap-3">
                 <span className="text-xs text-foreground/30 tabular-nums w-5 text-right">
@@ -499,7 +507,7 @@ export default function Music() {
                   </p>
                 </div>
                 <span className="text-xs text-foreground/30 tabular-nums shrink-0">
-                  {song.track_popularity}%
+                  Popularidad: {song.track_popularity}%
                 </span>
               </div>
               <div className="flex flex-wrap gap-1.5">
@@ -519,7 +527,7 @@ export default function Music() {
                 {lyricsOpenIndex === i ? "Ocultar letra" : "Ver letra"}
               </button>
               {lyricsOpenIndex === i && song.lyrics && (
-                <div className="max-h-48 overflow-y-auto whitespace-pre-wrap rounded-lg bg-surface-2 p-3 text-xs text-foreground/70 leading-relaxed">
+                <div className="max-h-48 overflow-y-auto whitespace-pre-wrap rounded-lg bg-surface-2 p-3 text-sm text-foreground/70 leading-relaxed">
                   {song.lyrics}
                 </div>
               )}

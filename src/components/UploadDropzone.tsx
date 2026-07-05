@@ -3,13 +3,13 @@
 import { useRef, useState } from "react";
 
 interface UploadDropzoneProps {
-  /** File input `accept` value, e.g. "image/*" or "audio/*". */
+
   accept: string;
   title: string;
   hint: string;
   icon: React.ReactNode;
   onFile: (file: File) => void;
-  /** Called when a dropped file does not match `accept`. */
+
   onInvalid?: (message: string) => void;
   invalidMessage?: string;
 }

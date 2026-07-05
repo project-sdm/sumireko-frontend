@@ -152,11 +152,10 @@ export default function Ecommerce() {
 
       <PageHeader
         title="Búsqueda E-Commerce"
-        subtitle="Sube una imagen o toma una foto para encontrar prendas similares"
+        subtitle="Sube una imagen o toma una foto para encontrar prendas similares."
         icon={<CameraIcon className="h-6 w-6" />}
       />
 
-      {/* Mode toggle — hide once we have a preview */}
       {!preview && (
         <div className="flex justify-center">
           <div className="flex rounded-lg bg-surface border border-surface-border p-1 gap-1">
@@ -177,7 +176,6 @@ export default function Ecommerce() {
         </div>
       )}
 
-      {/* Upload zone */}
       {mode === "upload" && !preview && (
         <UploadDropzone
           accept="image/*"
@@ -204,7 +202,6 @@ export default function Ecommerce() {
         />
       )}
 
-      {/* Camera viewfinder */}
       {mode === "camera" && !preview && (
         <div className="flex flex-col items-center gap-4">
           <div className="relative w-full rounded-xl overflow-hidden bg-black aspect-video flex items-center justify-center">
@@ -242,7 +239,6 @@ export default function Ecommerce() {
         </div>
       )}
 
-      {/* Preview */}
       {preview && (
         <div className="flex flex-col items-center gap-3">
           <div className="w-full rounded-xl border border-surface-border overflow-hidden">
@@ -261,7 +257,6 @@ export default function Ecommerce() {
         </div>
       )}
 
-      {/* Controls */}
       {preview && (
         <div className="flex flex-wrap items-center justify-center gap-4 rounded-xl border border-surface-border bg-surface p-4 shadow-soft">
           <SearchModeSelector value={searchMode} onChange={setSearchMode} />

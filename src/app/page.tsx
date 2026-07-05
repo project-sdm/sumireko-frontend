@@ -12,8 +12,7 @@ const apps = [
   {
     href: "/music",
     title: "Búsqueda Musical",
-    description:
-      "Busca canciones por su letra o por características acústicas MFCC.",
+    description: "Busca canciones por su letra o por audio.",
     icon: <MusicNoteIcon className="h-8 w-8" />,
   },
 ];

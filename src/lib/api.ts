@@ -6,7 +6,6 @@ import {
 export const API_URL =
   process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
-/** Wraps fetch so a network failure becomes a readable message. */
 async function safeFetch(url: string, init?: RequestInit): Promise<Response> {
   try {
     return await fetch(url, init);
@@ -42,10 +41,15 @@ async function postFile<T>(
   return schema.parse(await res.json());
 }
 
-export async function searchByText(q: string, k = 5): Promise<AudioSearchResponse> {
+export async function searchByText(
+  q: string,
+  k = 5,
+  searchMode?: string,
+): Promise<AudioSearchResponse> {
   const url = new URL("/text/search", API_URL);
   url.searchParams.set("q", q);
   url.searchParams.set("k", String(k));
+  if (searchMode) url.searchParams.set("mode", searchMode);
 
   const res = await safeFetch(url.toString());
 

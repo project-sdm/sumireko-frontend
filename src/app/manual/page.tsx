@@ -8,7 +8,7 @@ export default function Manual() {
 
       <PageHeader
         title="Manual de usuario"
-        subtitle="Cómo usar cada página del sistema"
+        subtitle=""
         icon={
           <svg
             className="h-6 w-6"
@@ -44,9 +44,8 @@ export default function Manual() {
           </li>
           <li>
             Elige el modo de búsqueda:{" "}
-            <span className="font-medium text-foreground">Nativo</span> (tu
-            índice invertido) o Postgres (Fuerza Bruta, IVFFlat o HNSW) para
-            comparar contra pgvector.
+            <span className="font-medium text-foreground">Nativo</span> (índice
+            invertido propio) o Postgres (fuerza bruta, IVFFlat o HNSW).
           </li>
           <li>
             Ajusta el número de resultados (<span className="font-mono">k</span>
@@ -77,8 +76,8 @@ export default function Manual() {
             Elige el modo de entrada:{" "}
             <span className="font-medium text-foreground">Por letra</span>{" "}
             (escribe parte de la letra de una canción) o{" "}
-            <span className="font-medium text-foreground">Por audio</span>{" "}
-            (sube un archivo o graba desde el micrófono).
+            <span className="font-medium text-foreground">Por audio</span> (sube
+            un archivo o graba desde el micrófono).
           </li>
           <li>
             <span className="font-medium text-foreground">Modo texto:</span>{" "}
@@ -90,9 +89,10 @@ export default function Manual() {
           <li>
             <span className="font-medium text-foreground">Modo audio:</span>{" "}
             arrastra un archivo de audio, haz clic para elegirlo, o graba
-            directamente desde tu micrófono. Elige el modo de búsqueda (
-            <span className="font-medium text-foreground">Nativo</span> o
-            Postgres) y ajusta <span className="font-mono">k</span>.
+            directamente desde tu micrófono. Elige el modo de búsqueda:{" "}
+            <span className="font-medium text-foreground">Nativo</span> (índice
+            invertido propio) o Postgres (fuerza bruta, IVFFlat o HNSW) y ajusta{" "}
+            <span className="font-mono">k</span>.
           </li>
           <li>
             Presiona <span className="font-medium text-foreground">Buscar</span>
