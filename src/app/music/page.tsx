@@ -34,6 +34,65 @@ function formatTime(s: number): string {
   return `${m}:${(s % 60).toString().padStart(2, "0")}`;
 }
 
+async function blobToWav(blob: Blob): Promise<Blob> {
+  try {
+    const arrayBuffer = await blob.arrayBuffer();
+    const audioCtx = new AudioContext();
+    const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+
+    const numChannels = audioBuffer.numberOfChannels;
+    const sampleRate = audioBuffer.sampleRate;
+    const length = audioBuffer.length;
+
+    const channelData: Float32Array[] = [];
+    for (let ch = 0; ch < numChannels; ch++) {
+      channelData.push(audioBuffer.getChannelData(ch));
+    }
+
+    const pcm = new Int16Array(length);
+    for (let i = 0; i < length; i++) {
+      let sample = 0;
+      for (let ch = 0; ch < numChannels; ch++) {
+        sample += channelData[ch][i];
+      }
+      sample /= numChannels;
+      const s = Math.max(-1, Math.min(1, sample));
+      pcm[i] = s < 0 ? s * 0x8000 : s * 0x7fff;
+    }
+
+    const dataSize = length * 2;
+    const buffer = new ArrayBuffer(44 + dataSize);
+    const view = new DataView(buffer);
+
+    const w = (offset: number, str: string) => {
+      for (let i = 0; i < str.length; i++)
+        view.setUint8(offset + i, str.charCodeAt(i));
+    };
+
+    w(0, "RIFF");
+    view.setUint32(4, 36 + dataSize, true);
+    w(8, "WAVE");
+    w(12, "fmt ");
+    view.setUint32(16, 16, true);
+    view.setUint16(20, 1, true);
+    view.setUint16(22, 1, true);
+    view.setUint32(24, sampleRate, true);
+    view.setUint32(28, sampleRate * 2, true);
+    view.setUint16(32, 2, true);
+    view.setUint16(34, 16, true);
+    w(36, "data");
+    view.setUint32(40, dataSize, true);
+
+    for (let i = 0; i < length; i++)
+      view.setInt16(44 + i * 2, pcm[i], true);
+
+    audioCtx.close();
+    return new Blob([buffer], { type: "audio/wav" });
+  } catch {
+    return blob;
+  }
+}
+
 export default function Music() {
   const [inputMode, setInputMode] = useState<InputMode>("audio");
   const [query, setQuery] = useState("");
@@ -54,17 +113,20 @@ export default function Music() {
   const [recording, setRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const [searchMode, setSearchMode] = useState<SearchMode>("native");
+  const [lyricsOpenIndex, setLyricsOpenIndex] = useState<number | null>(null);
 
   const recorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<BlobPart[]>([]);
   const streamRef = useRef<MediaStream | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const audioUrlRef = useRef<string | null>(null);
 
   useEffect(() => {
     return () => {
       streamRef.current?.getTracks().forEach((t) => t.stop());
       if (timerRef.current) clearInterval(timerRef.current);
+      if (audioUrlRef.current) URL.revokeObjectURL(audioUrlRef.current);
     };
   }, []);
 
@@ -77,9 +139,12 @@ export default function Music() {
     setQuery("");
     resetSearch();
     setRecordingTime(0);
+    setLyricsOpenIndex(null);
   }
 
   function handleFile(f: File) {
+    if (audioUrlRef.current) URL.revokeObjectURL(audioUrlRef.current);
+    audioUrlRef.current = URL.createObjectURL(f);
     setFile(f);
     setFileName(f.name);
     resetSearch();
@@ -112,11 +177,19 @@ export default function Music() {
         if (e.data.size > 0) chunksRef.current.push(e.data);
       };
 
-      recorder.onstop = () => {
+      recorder.onstop = async () => {
         const type = recorder.mimeType || "audio/webm";
         const ext = type.split("/")[1]?.split(";")[0] || "webm";
         const blob = new Blob(chunksRef.current, { type });
-        handleFile(new File([blob], `recording.${ext}`, { type }));
+        const wavBlob = await blobToWav(blob);
+        const isWav = wavBlob !== blob;
+        handleFile(
+          new File(
+            [wavBlob],
+            isWav ? "recording.wav" : `recording.${ext}`,
+            { type: isWav ? "audio/wav" : type },
+          ),
+        );
         streamRef.current?.getTracks().forEach((t) => t.stop());
         streamRef.current = null;
       };
@@ -147,6 +220,7 @@ export default function Music() {
     const committed = clampK(kRaw, k);
     setK(committed);
     setKRaw(String(committed));
+    setLyricsOpenIndex(null);
     await run(() => searchByText(query.trim(), committed));
   }
 
@@ -155,14 +229,18 @@ export default function Music() {
     const committed = clampK(kRaw, k);
     setK(committed);
     setKRaw(String(committed));
+    setLyricsOpenIndex(null);
     await run(() => searchByAudio(file, committed, searchMode));
   }
 
   function resetAudio() {
+    if (audioUrlRef.current) URL.revokeObjectURL(audioUrlRef.current);
+    audioUrlRef.current = null;
     setFile(null);
     setFileName(null);
     resetSearch();
     setRecordingTime(0);
+    setLyricsOpenIndex(null);
   }
 
   function activeTabStyle(active: boolean) {
@@ -341,6 +419,13 @@ export default function Music() {
         </div>
       )}
 
+      {/* Audio: preview player */}
+      {inputMode === "audio" && fileName && audioUrlRef.current && (
+        <audio controls src={audioUrlRef.current} className="w-full h-10">
+          Tu navegador no soporta audio
+        </audio>
+      )}
+
       {/* Audio: controls */}
       {inputMode === "audio" && fileName && (
         <div className="flex flex-wrap items-center justify-center gap-4 rounded-xl border border-surface-border bg-surface p-4 shadow-soft">
@@ -425,6 +510,19 @@ export default function Music() {
                   {song.track_album_name}
                 </span>
               </div>
+              <button
+                onClick={() =>
+                  setLyricsOpenIndex(lyricsOpenIndex === i ? null : i)
+                }
+                className="text-xs text-accent hover:underline transition-colors self-start"
+              >
+                {lyricsOpenIndex === i ? "Ocultar letra" : "Ver letra"}
+              </button>
+              {lyricsOpenIndex === i && song.lyrics && (
+                <div className="max-h-48 overflow-y-auto whitespace-pre-wrap rounded-lg bg-surface-2 p-3 text-xs text-foreground/70 leading-relaxed">
+                  {song.lyrics}
+                </div>
+              )}
               <audio
                 controls
                 src={`${API_URL}/media/audios/${song.track_id}.mp3`}

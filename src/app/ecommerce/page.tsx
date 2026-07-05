@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { API_URL, searchByImage } from "@/lib/api";
 import { useSearch } from "@/lib/useSearch";
-import { type ImageSearchResponse } from "@/lib/schemas";
+import { type ImageSearchResponse, type Product } from "@/lib/schemas";
 import { KSelector } from "@/components/KSelector";
 import { BackLink } from "@/components/BackLink";
 import { PageHeader } from "@/components/PageHeader";
@@ -119,6 +119,33 @@ export default function Ecommerce() {
     await run(() => searchByImage(file, committed, searchMode));
   }
 
+  async function searchSimilar(product: Product) {
+    try {
+      setError(null);
+      const resp = await fetch(`${API_URL}/media/images/${product.filename}`);
+      if (!resp.ok) throw new Error("No se pudo obtener la imagen");
+      const blob = await resp.blob();
+      const newFile = new File([blob], product.filename, {
+        type: blob.type || "image/jpeg",
+      });
+
+      if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current);
+      const url = URL.createObjectURL(newFile);
+      previewUrlRef.current = url;
+      setFile(newFile);
+      setPreview(url);
+
+      const committed = clampK(kRaw, k);
+      setK(committed);
+      setKRaw(String(committed));
+      await run(() => searchByImage(newFile, committed, searchMode));
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Error al buscar similares",
+      );
+    }
+  }
+
   return (
     <main className="mx-auto max-w-3xl px-4 py-16 flex flex-col gap-10">
       <BackLink />
@@ -227,7 +254,7 @@ export default function Ecommerce() {
           </div>
           <button
             onClick={resetToInput}
-            className="text-xs text-foreground/40 hover:text-foreground/70 transition-colors"
+            className="text-lg hover:text-foreground/70 transition-colors cursor-pointer"
           >
             {mode === "camera" ? "Tomar otra foto" : "Cambiar imagen"}
           </button>
@@ -273,7 +300,7 @@ export default function Ecommerce() {
 
       {!loading && timeMs !== null && (
         <div className="flex flex-col gap-4">
-          <p className="text-center text-xs text-foreground/40 tabular-nums">
+          <p className="text-center text-md text-foreground/50 tabular-nums">
             {results.length} resultados en {timeMs} ms
           </p>
           {results.length === 0 && (
@@ -297,9 +324,11 @@ export default function Ecommerce() {
                     <p className="text-sm font-medium truncate">
                       {product.name}
                     </p>
-                    <p className="text-xs text-foreground/50 truncate">
-                      {product.variant_name}
-                    </p>
+                    {product.variant_name && (
+                      <p className="text-xs text-foreground/50 truncate">
+                        {product.variant_name}
+                      </p>
+                    )}
                     {product.brand_name && (
                       <p className="text-xs text-foreground/40">
                         {product.brand_name}
@@ -320,6 +349,13 @@ export default function Ecommerce() {
                         {product.categories}
                       </p>
                     )}
+                    <button
+                      onClick={() => searchSimilar(product)}
+                      disabled={loading}
+                      className="mt-1 text-sm text-accent hover:underline transition-colors text-left disabled:opacity-40 cursor-pointer"
+                    >
+                      Ver similares
+                    </button>
                   </div>
                 </div>
               ))}

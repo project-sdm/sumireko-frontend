@@ -4,7 +4,7 @@ export const Product = z.object({
   filename: z.string(),
   price: z.int(),
   name: z.string(),
-  variant_name: z.string(),
+  variant_name: z.string().nullable(),
   year: z.int().nullable(),
   brand_name: z.string().nullable(),
   season: z.string().nullable(),
