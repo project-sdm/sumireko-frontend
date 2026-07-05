@@ -13,6 +13,21 @@ import { type SearchMode } from "@/lib/searchModes";
 import { CameraIcon } from "@/components/icons";
 import { clampK } from "@/lib/clampK";
 
+const TOP_STYLES = [
+  {
+    card: "border-amber-400/30 bg-amber-50/50 dark:bg-amber-950/20",
+    badge: "bg-amber-500 text-white ring-2 ring-amber-300",
+  },
+  {
+    card: "border-slate-400/30 bg-slate-50/50 dark:bg-slate-950/20",
+    badge: "bg-slate-500 text-white ring-2 ring-slate-300",
+  },
+  {
+    card: "border-orange-400/30 bg-orange-50/50 dark:bg-orange-950/20",
+    badge: "bg-orange-600 text-white ring-2 ring-orange-300",
+  },
+] as const;
+
 type Mode = "upload" | "camera";
 
 export default function Ecommerce() {
@@ -308,13 +323,28 @@ export default function Ecommerce() {
               {results.map((product, i) => (
                 <div
                   key={i}
-                  className="flex flex-col rounded-xl border border-surface-border bg-surface shadow-soft overflow-hidden transition-all hover:shadow-lg"
+                  className={`flex flex-col rounded-xl border shadow-soft overflow-hidden transition-all hover:shadow-lg ${
+                    i < 3
+                      ? TOP_STYLES[i].card
+                      : "border-surface-border bg-surface"
+                  }`}
                 >
-                  <img
-                    src={`${API_URL}/media/images/${product.filename}`}
-                    alt={product.name}
-                    className="aspect-square w-full object-cover"
-                  />
+                  <div className="relative">
+                    <img
+                      src={`${API_URL}/media/images/${product.filename}`}
+                      alt={product.name}
+                      className="aspect-square w-full object-cover"
+                    />
+                    <span
+                      className={`absolute top-2 left-2 flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold tabular-nums shadow-xs ${
+                        i < 3
+                          ? TOP_STYLES[i].badge
+                          : "bg-background/85 text-foreground"
+                      }`}
+                    >
+                      {i + 1}
+                    </span>
+                  </div>
                   <div className="flex flex-col gap-1 p-3">
                     <p className="text-sm font-medium truncate">
                       {product.name}

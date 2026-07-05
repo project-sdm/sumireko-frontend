@@ -70,7 +70,7 @@ export default function RootLayout({
               rel="noopener noreferrer"
               className="hover:text-foreground transition-colors"
             >
-              GitHub ↗
+              GitHub
             </a>
           </div>
         </footer>
